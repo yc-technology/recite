@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Grade } from "@/lib/srs/sm2";
 import { Button, Label } from "@/components/nothing";
+import { Markdown } from "@/components/Markdown";
 
 export type DueSection = {
   index: number;
@@ -157,9 +158,7 @@ export function PracticeSession({
             </div>
             <div className="space-y-1">
               <Label className="!text-success">Optimized</Label>
-              <p className="font-grotesk text-primary text-[16px] leading-[1.6] whitespace-pre-wrap">
-                {current.optimized}
-              </p>
+              <Markdown>{current.optimized}</Markdown>
             </div>
             <div className="space-y-1">
               <Label>Your original</Label>

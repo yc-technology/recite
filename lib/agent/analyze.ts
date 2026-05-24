@@ -13,10 +13,14 @@ SAME ORDER, produce:
 - "summary": one sentence on what the section is about.
 - "keyPoints": 3-5 concise points the speaker must convey.
 - "difficulty": "easy" | "medium" | "hard" for reciting it from understanding.
-- "optimized": a polished, presentation-ready rewrite of the section in natural, fluent,
-  native English. Improve clarity, flow, word choice, and spoken delivery while preserving
-  the speaker's meaning and intent. Keep it roughly the same length — it must be deliverable
-  aloud as a real presentation. Do NOT add new facts.
+- "optimized": a clearer, presentation-ready rewrite of the section, formatted as clean
+  STANDARD MARKDOWN. Rules for "optimized":
+  * Use SIMPLE, COMMON, everyday English words. Avoid advanced, fancy, or rare vocabulary
+    (e.g. prefer "use" over "leverage", "show" over "demonstrate", "start" over "commence").
+  * Short sentences that are easy to say aloud and easy to memorize.
+  * Clear structure: short paragraphs separated by blank lines; use "- " bullet lists for
+    enumerations; use **bold** for only a few key terms. Do NOT use headings (#).
+  * Preserve the speaker's meaning and intent. Do NOT add new facts.
 
 Respond with ONLY a single JSON object of exactly this shape:
 { "enrichments": [ { "summary": string, "keyPoints": string[], "difficulty": "easy" | "medium" | "hard", "optimized": string } ] }

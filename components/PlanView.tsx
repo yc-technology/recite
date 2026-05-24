@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { PresentationRecord } from "@/lib/store/types";
 import { Button, Card, Label } from "@/components/nothing";
 import { PresentationActions } from "@/components/PresentationActions";
+import { Markdown } from "@/components/Markdown";
 
 const difficultyColor: Record<string, string> = {
   easy: "text-success",
@@ -84,9 +85,7 @@ export function PlanView({
 
               <div className="pl-11 space-y-2">
                 <Label className="!text-success">Optimized</Label>
-                <p className="text-primary text-[15px] leading-[1.6] whitespace-pre-wrap">
-                  {sec.optimized}
-                </p>
+                <Markdown>{sec.optimized}</Markdown>
               </div>
 
               <details className="pl-11 group">
