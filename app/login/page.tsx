@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ArrowRight, CheckSquare, Square } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Label } from "@/components/nothing";
@@ -149,7 +150,7 @@ export default function LoginPage() {
             className="flex items-center gap-2 pt-1"
           >
             <span className={remember ? "text-success" : "text-disabled"}>
-              {remember ? "☑" : "☐"}
+              {remember ? <CheckSquare size={15} /> : <Square size={15} />}
             </span>
             <Label className="hover:text-primary">Remember this account</Label>
           </button>
@@ -157,11 +158,18 @@ export default function LoginPage() {
           <div className="flex gap-2 pt-2">
             <Button
               variant="primary"
-              className="flex-1"
+              className="flex-1 gap-2"
               disabled={busy}
               onClick={() => run("in")}
             >
-              {busy ? "…" : "Sign in →"}
+              {busy ? (
+                "…"
+              ) : (
+                <>
+                  Sign in
+                  <ArrowRight size={15} />
+                </>
+              )}
             </Button>
             <Button
               variant="outline"

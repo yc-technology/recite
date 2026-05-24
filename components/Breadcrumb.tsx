@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 type Crumb = { label: string; href?: string };
 
@@ -19,7 +20,7 @@ export function Breadcrumb({ items }: { items: Crumb[] }) {
                 {it.label}
               </span>
             )}
-            {!last && <span className="label !text-disabled">/</span>}
+            {!last && <ChevronRight size={13} className="text-disabled shrink-0" />}
           </span>
         );
       })}

@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
+import { AudioLines, Pause, Play, Square } from "lucide-react";
 import { makeUtterance, stripMarkdown, supportsTTS } from "@/lib/tts";
 
 type Ctx = {
@@ -97,20 +98,33 @@ export function TtsProvider({ children }: { children: ReactNode }) {
         }`}
       >
         <div className="flex items-center gap-5 bg-surface border border-border-strong rounded-full px-6 py-3">
-          <span className="label !text-accent">
-            {paused ? "❚❚ PAUSED" : "♪ PLAYING"}
+          <span className="label !text-accent flex items-center gap-1.5">
+            <AudioLines size={14} />
+            {paused ? "PAUSED" : "PLAYING"}
           </span>
           {paused ? (
-            <button onClick={resume} className="label !text-success hover:opacity-80">
-              ▶ RESUME
+            <button
+              onClick={resume}
+              className="label !text-success hover:opacity-80 flex items-center gap-1.5"
+            >
+              <Play size={14} />
+              RESUME
             </button>
           ) : (
-            <button onClick={pause} className="label hover:text-primary">
-              ⏸ PAUSE
+            <button
+              onClick={pause}
+              className="label hover:text-primary flex items-center gap-1.5"
+            >
+              <Pause size={14} />
+              PAUSE
             </button>
           )}
-          <button onClick={stop} className="label hover:text-accent">
-            ■ STOP
+          <button
+            onClick={stop}
+            className="label hover:text-accent flex items-center gap-1.5"
+          >
+            <Square size={13} />
+            STOP
           </button>
         </div>
       </div>

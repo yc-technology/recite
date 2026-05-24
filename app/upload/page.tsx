@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowRight, X } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Label } from "@/components/nothing";
 import { useNotify } from "@/components/Notify";
@@ -138,10 +139,10 @@ export default function UploadPage() {
                     />
                     <button
                       onClick={() => removeSection(i)}
-                      className="label hover:text-accent"
+                      className="text-disabled hover:text-accent shrink-0"
                       aria-label="Remove section"
                     >
-                      ✕
+                      <X size={16} />
                     </button>
                   </div>
                   <textarea
@@ -157,11 +158,16 @@ export default function UploadPage() {
               variant="primary"
               onClick={analyze}
               disabled={busy === "analyzing" || sections.length === 0}
-              className="w-full"
+              className="w-full gap-2"
             >
-              {busy === "analyzing"
-                ? "[ BUILDING PLAN… ]"
-                : "Generate study plan →"}
+              {busy === "analyzing" ? (
+                "[ BUILDING PLAN… ]"
+              ) : (
+                <>
+                  Generate study plan
+                  <ArrowRight size={15} />
+                </>
+              )}
             </Button>
           </div>
         )}

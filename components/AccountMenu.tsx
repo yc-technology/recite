@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { LogOut, Plus, Settings } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Label, ThemeToggle } from "@/components/nothing";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -25,8 +26,9 @@ export function AccountMenu() {
 
   return (
     <div className="flex items-center gap-6">
-      <Link href="/upload" className="label hover:text-primary">
-        + NEW
+      <Link href="/upload" className="label hover:text-primary flex items-center gap-1.5">
+        <Plus size={13} />
+        NEW
       </Link>
       <div className="relative">
       <button
@@ -54,11 +56,15 @@ export function AccountMenu() {
             <Link
               href="/settings"
               onClick={() => setOpen(false)}
-              className="block px-3 py-2 text-primary text-[14px] hover:bg-surface-raised rounded-[4px]"
+              className="flex items-center gap-2 px-3 py-2 text-primary text-[14px] hover:bg-surface-raised rounded-[4px]"
             >
+              <Settings size={15} />
               Settings
             </Link>
-            <LogoutButton className="w-full text-left px-3 py-2 text-accent text-[14px] hover:bg-surface-raised rounded-[4px]" />
+            <LogoutButton className="w-full flex items-center gap-2 text-left px-3 py-2 text-accent text-[14px] hover:bg-surface-raised rounded-[4px]">
+              <LogOut size={15} />
+              Log out
+            </LogoutButton>
           </div>
         </>
       )}

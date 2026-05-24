@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button, Label } from "@/components/nothing";
 import { useNotify } from "@/components/Notify";
 
@@ -80,8 +81,9 @@ export function PresentationActions({
     <div className="flex items-center gap-5">
       <button
         onClick={() => setEditing(true)}
-        className="label hover:text-primary"
+        className="label hover:text-primary flex items-center gap-1.5"
       >
+        <Pencil size={13} />
         RENAME
       </button>
       {confirming ? (
@@ -103,8 +105,9 @@ export function PresentationActions({
       ) : (
         <button
           onClick={() => setConfirming(true)}
-          className="label hover:text-accent"
+          className="label hover:text-accent flex items-center gap-1.5"
         >
+          <Trash2 size={13} />
           DELETE
         </button>
       )}

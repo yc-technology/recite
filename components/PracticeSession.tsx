@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { ArrowRight, CheckSquare, Square } from "lucide-react";
 import { Grade } from "@/lib/srs/sm2";
 import { Button, Label } from "@/components/nothing";
 import { SpeakableMarkdown } from "@/components/SpeakableMarkdown";
@@ -194,10 +195,10 @@ export function PracticeSession({
                       onClick={() =>
                         setChecked((c) => c.map((v, j) => (j === i ? !v : v)))
                       }
-                      className="flex gap-2 text-left text-[17px] w-full hover:text-primary"
+                      className="flex gap-2 text-left text-[17px] w-full hover:text-primary items-start"
                     >
-                      <span className={checked[i] ? "text-success" : "text-disabled"}>
-                        {checked[i] ? "☑" : "☐"}
+                      <span className={`mt-1 shrink-0 ${checked[i] ? "text-success" : "text-disabled"}`}>
+                        {checked[i] ? <CheckSquare size={17} /> : <Square size={17} />}
                       </span>
                       <span className={checked[i] ? "text-primary" : "text-secondary"}>
                         {kp}
@@ -224,11 +225,12 @@ export function PracticeSession({
       {!revealed ? (
         <Button
           variant="primary"
-          className="w-full py-4"
+          className="w-full py-4 gap-2"
           onClick={() => setRevealed(true)}
         >
-          Reveal →{"  "}
-          <span className="opacity-60 ml-2">[space]</span>
+          Reveal
+          <ArrowRight size={15} />
+          <span className="opacity-60 ml-1">space</span>
         </Button>
       ) : (
         <div className="grid grid-cols-4 gap-2">

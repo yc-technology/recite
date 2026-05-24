@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronRight, List, Play, X } from "lucide-react";
 import { Card, Label } from "@/components/nothing";
 import { SpeakableMarkdown } from "@/components/SpeakableMarkdown";
 
@@ -110,9 +111,13 @@ export function SectionBoard({
                   <SpeakableMarkdown>{sec.optimized}</SpeakableMarkdown>
                 </div>
 
-                <details className="pl-10">
-                  <summary className="label cursor-pointer hover:text-primary list-none">
-                    ▸ Original
+                <details className="pl-10 group">
+                  <summary className="label cursor-pointer hover:text-primary list-none flex items-center gap-1.5">
+                    <ChevronRight
+                      size={13}
+                      className="transition-transform group-open:rotate-90"
+                    />
+                    Original
                   </summary>
                   <p className="mt-2 text-secondary text-[13px] font-mono leading-relaxed whitespace-pre-wrap">
                     {sec.text}
@@ -124,9 +129,10 @@ export function SectionBoard({
                     onClick={() =>
                       router.push(`/practice/${id}?sections=${sec.index}`)
                     }
-                    className="label hover:text-primary"
+                    className="label hover:text-primary flex items-center gap-1.5"
                   >
-                    ▶ PRACTICE THIS
+                    <Play size={13} />
+                    PRACTICE THIS
                   </button>
                 </div>
               </Card>
@@ -195,9 +201,9 @@ export function SectionBoard({
       <button
         onClick={() => setNavOpen((o) => !o)}
         aria-label="Section navigator"
-        className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-accent text-white font-mono text-[18px] flex items-center justify-center hover:opacity-90"
+        className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center hover:opacity-90"
       >
-        {navOpen ? "✕" : "≡"}
+        {navOpen ? <X size={20} /> : <List size={20} />}
       </button>
     </>
   );

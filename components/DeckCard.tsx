@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import { Card, Label } from "@/components/nothing";
 import { useNotify } from "@/components/Notify";
 
@@ -74,10 +75,10 @@ export function DeckCard({
         ) : (
           <button
             onClick={() => setConfirming(true)}
-            className="label hover:text-accent"
+            className="text-disabled hover:text-accent"
             aria-label="Delete deck"
           >
-            ✕
+            <Trash2 size={16} />
           </button>
         )}
       </div>

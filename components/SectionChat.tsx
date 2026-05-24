@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ChevronRight, MessageCircle, Send } from "lucide-react";
 import { useNotify } from "@/components/Notify";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -79,9 +80,14 @@ export function SectionChat({
     <div className="border-t border-border pt-4">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="label hover:text-primary"
+        className="label hover:text-primary flex items-center gap-1.5"
       >
-        {open ? "▾ COACH" : "▸ ASK THE COACH"}
+        {open ? (
+          <ChevronRight size={13} className="rotate-90" />
+        ) : (
+          <MessageCircle size={13} />
+        )}
+        {open ? "COACH" : "ASK THE COACH"}
       </button>
 
       {open && (
@@ -127,9 +133,10 @@ export function SectionChat({
             <button
               onClick={() => send(input)}
               disabled={busy || !input.trim()}
-              className="label border border-border-strong rounded-[4px] px-3 hover:border-primary disabled:opacity-40"
+              aria-label="Send"
+              className="border border-border-strong rounded-[4px] px-3 flex items-center text-secondary hover:border-primary hover:text-primary disabled:opacity-40"
             >
-              SEND
+              <Send size={15} />
             </button>
           </div>
         </div>

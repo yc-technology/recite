@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight, Plus } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Card, Label } from "@/components/nothing";
 import { DeckCard } from "@/components/DeckCard";
@@ -37,8 +38,9 @@ export default async function Dashboard() {
               {totalDue}
             </span>
             <Link href={focusHref}>
-              <Button variant="primary" className="px-10 py-5 text-[13px]">
-                {totalDue > 0 ? "Enter focus →" : "Start a deck →"}
+              <Button variant="primary" className="px-10 py-5 text-[13px] gap-2">
+                {totalDue > 0 ? "Enter focus" : "Start a deck"}
+                <ArrowRight size={15} />
               </Button>
             </Link>
           </div>
@@ -53,8 +55,9 @@ export default async function Dashboard() {
         <section className="space-y-5">
           <div className="flex items-center justify-between">
             <Label>Decks — {decks.length}</Label>
-            <Link href="/upload" className="label hover:text-primary">
-              + NEW
+            <Link href="/upload" className="label hover:text-primary flex items-center gap-1.5">
+              <Plus size={13} />
+              NEW
             </Link>
           </div>
 
