@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
@@ -8,12 +8,20 @@ import { Button, Label } from "@/components/nothing";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function run(kind: "in" | "up") {
+    // Read straight from the inputs so browser autofill (which may not fire
+    // onChange) is always picked up.
+    const email = emailRef.current?.value.trim() ?? "";
+    const password = passwordRef.current?.value ?? "";
+    if (!email || !password) {
+      setStatus("[ERROR: enter email and password]");
+      return;
+    }
     setBusy(true);
     setStatus(null);
     const supabase = createClient();
@@ -48,18 +56,21 @@ export default function LoginPage() {
           <div className="space-y-2">
             <Label>Email</Label>
             <input
+              ref={emailRef}
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              autoComplete="email"
               className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none"
             />
           </div>
           <div className="space-y-2">
             <Label>Password</Label>
             <input
+              ref={passwordRef}
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              autoComplete="current-password"
+              onKeyDown={(e) => e.key === "Enter" && run("in")}
               className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none"
             />
           </div>
@@ -67,14 +78,14 @@ export default function LoginPage() {
             <Button
               variant="primary"
               className="flex-1"
-              disabled={busy || !email || !password}
+              disabled={busy}
               onClick={() => run("in")}
             >
-              Sign in →
+              {busy ? "…" : "Sign in →"}
             </Button>
             <Button
               variant="outline"
-              disabled={busy || !email || !password}
+              disabled={busy}
               onClick={() => run("up")}
             >
               Sign up
