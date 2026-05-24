@@ -1,26 +1,118 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
+  Nothing-inspired design system.
+  Palette lives in plain CSS vars on :root (dark = default) and is overridden
+  per theme so a runtime [data-theme] toggle works. @theme inline re-exports
+  them as var() references so Tailwind utilities stay live, not build-frozen.
+*/
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-disabled: var(--disabled);
+  --color-secondary: var(--secondary);
+  --color-primary: var(--primary);
+  --color-display: var(--display);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-interactive: var(--interactive);
+
+  --font-grotesk: "Space Grotesk", "DM Sans", system-ui, sans-serif;
+  --font-mono: "Space Mono", "JetBrains Mono", "SF Mono", monospace;
+  --font-doto: "Doto", "Space Mono", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Dark mode — the default canvas (OLED black, glowing data). */
+:root {
+  --bg: #000000;
+  --surface: #111111;
+  --surface-raised: #1a1a1a;
+  --border: #222222;
+  --border-strong: #333333;
+  --disabled: #666666;
+  --secondary: #999999;
+  --primary: #e8e8e8;
+  --display: #ffffff;
+  --accent: #d71921;
+  --success: #4a9e5c;
+  --warning: #d4a843;
+  --interactive: #5b9bf6;
+}
+
+/* Light mode — printed technical manual (warm paper, black ink). */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface-raised: #f0f0f0;
+    --border: #e8e8e8;
+    --border-strong: #cccccc;
+    --disabled: #999999;
+    --secondary: #666666;
+    --primary: #1a1a1a;
+    --display: #000000;
+    --interactive: #007aff;
   }
+}
+[data-theme="light"] {
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-raised: #f0f0f0;
+  --border: #e8e8e8;
+  --border-strong: #cccccc;
+  --disabled: #999999;
+  --secondary: #666666;
+  --primary: #1a1a1a;
+  --display: #000000;
+  --interactive: #007aff;
+}
+[data-theme="dark"] {
+  --bg: #000000;
+  --surface: #111111;
+  --surface-raised: #1a1a1a;
+  --border: #222222;
+  --border-strong: #333333;
+  --disabled: #666666;
+  --secondary: #999999;
+  --primary: #e8e8e8;
+  --display: #ffffff;
+  --interactive: #5b9bf6;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--primary);
+  font-family: var(--font-grotesk);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Instrument-panel labels: Space Mono, ALL CAPS, wide tracking. */
+.label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--secondary);
+}
+
+/* Dot-matrix motif (decorative grid backgrounds). */
+.dot-grid {
+  background-image: radial-gradient(circle, var(--border-strong) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Mechanical ease-out for all interactive transitions. */
+@layer base {
+  a,
+  button {
+    transition:
+      color 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+      border-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1),
+      background-color 180ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
 }
