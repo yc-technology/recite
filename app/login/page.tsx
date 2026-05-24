@@ -1,10 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Label } from "@/components/nothing";
+
+const REMEMBER_KEY = "recite:email";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,6 +14,19 @@ export default function LoginPage() {
   const passwordRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [remember, setRemember] = useState(true);
+
+  // Prefill the remembered email on load (password is left to the browser's
+  // password manager via autoComplete).
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(REMEMBER_KEY);
+      if (saved && emailRef.current) {
+        emailRef.current.value = saved;
+        setRemember(true);
+      }
+    } catch {}
+  }, []);
 
   async function run(kind: "in" | "up") {
     // Read straight from the inputs so browser autofill (which may not fire
@@ -22,6 +37,10 @@ export default function LoginPage() {
       setStatus("[ERROR: enter email and password]");
       return;
     }
+    try {
+      if (remember) localStorage.setItem(REMEMBER_KEY, email);
+      else localStorage.removeItem(REMEMBER_KEY);
+    } catch {}
     setBusy(true);
     setStatus(null);
     const supabase = createClient();
@@ -74,6 +93,17 @@ export default function LoginPage() {
               className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none"
             />
           </div>
+          <button
+            type="button"
+            onClick={() => setRemember((r) => !r)}
+            className="flex items-center gap-2 pt-1"
+          >
+            <span className={remember ? "text-success" : "text-disabled"}>
+              {remember ? "☑" : "☐"}
+            </span>
+            <Label className="hover:text-primary">Remember this account</Label>
+          </button>
+
           <div className="flex gap-2 pt-2">
             <Button
               variant="primary"
