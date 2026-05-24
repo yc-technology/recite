@@ -16,7 +16,7 @@ Nothing design language (monochrome, dot-matrix, one red accent), with light/dar
 ## Setup
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env.local   # then fill in the values below
 ```
 
@@ -51,9 +51,9 @@ before signing in.
 ## Develop
 
 ```bash
-npm run dev      # http://localhost:3000
-npm test         # run the unit suite (Vitest)
-npm run build    # production build
+pnpm dev         # http://localhost:3000
+pnpm test        # run the unit suite (Vitest)
+pnpm build       # production build
 ```
 
 ### Flow
