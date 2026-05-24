@@ -42,6 +42,14 @@ export function SectionBoard({
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [navOpen, setNavOpen] = useState(false);
+
+  function jumpTo(i: number) {
+    setNavOpen(false);
+    document
+      .getElementById(`sec-${i}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   function toggle(i: number) {
     setSelected((prev) => {
@@ -78,7 +86,8 @@ export function SectionBoard({
             return (
               <Card
                 key={sec.index}
-                className={`space-y-3 ${isSel ? "border-primary" : ""}`}
+                id={`sec-${sec.index}`}
+                className={`space-y-3 scroll-mt-6 ${isSel ? "border-primary" : ""}`}
               >
                 <div className="flex items-center gap-3">
                   <button
@@ -190,6 +199,45 @@ export function SectionBoard({
           </Button>
         </div>
       )}
+
+      {/* Floating section navigator — jump to any section from anywhere */}
+      {navOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-30"
+            onClick={() => setNavOpen(false)}
+          />
+          <div className="fixed bottom-24 right-6 z-40 w-64 max-h-[60vh] overflow-auto bg-surface border border-border-strong rounded-[8px] p-2">
+            <div className="px-3 py-2 border-b border-border">
+              <Label>Jump to section</Label>
+            </div>
+            {sections.map((s) => (
+              <button
+                key={s.index}
+                onClick={() => jumpTo(s.index)}
+                className="w-full flex items-center gap-3 text-left px-3 py-2 hover:bg-surface-raised rounded-[4px]"
+              >
+                <span className="font-mono text-secondary text-[12px] w-6 shrink-0">
+                  {String(s.index + 1).padStart(2, "0")}
+                </span>
+                <span className="text-primary text-[14px] truncate flex-1">
+                  {s.title}
+                </span>
+                {s.due && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                )}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      <button
+        onClick={() => setNavOpen((o) => !o)}
+        aria-label="Section navigator"
+        className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-accent text-white font-mono text-[18px] flex items-center justify-center hover:opacity-90"
+      >
+        {navOpen ? "✕" : "≡"}
+      </button>
     </>
   );
 }
