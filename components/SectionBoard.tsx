@@ -53,9 +53,33 @@ export function SectionBoard({
 
   const mastered = sections.filter((s) => s.level >= 3).length;
   const dueCount = sections.filter((s) => s.due).length;
+  const pct = Math.round(
+    (sections.reduce((s, x) => s + (x.level - 1), 0) /
+      (sections.length * 2 || 1)) *
+      100,
+  );
 
   return (
     <>
+      {/* Progress — sticks to the top while scrolling through sections */}
+      <div className="sticky top-0 z-30 -mx-6 md:-mx-10 px-6 md:px-10 py-3 bg-bg border-b border-border space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          <Label>Progress</Label>
+          <Label>
+            {mastered}/{sections.length} mastered · {dueCount} due · {pct}%
+          </Label>
+        </div>
+        <div className="flex gap-1">
+          {sections.map((s) => (
+            <div
+              key={s.index}
+              title={`${s.title} — L${s.level}`}
+              className={`flex-1 h-1.5 rounded-[2px] ${levelBar[s.level] ?? "bg-border-strong"}`}
+            />
+          ))}
+        </div>
+      </div>
+
       <section className="space-y-5">
         <Label>Sections — {sections.length}</Label>
 
@@ -141,32 +165,6 @@ export function SectionBoard({
         </ol>
       </section>
 
-      {/* Progress */}
-      <section className="space-y-4">
-        <Label>Progress</Label>
-        <div className="flex gap-1">
-          {sections.map((s) => (
-            <div
-              key={s.index}
-              title={`${s.title} — L${s.level}`}
-              className={`flex-1 h-2 rounded-[2px] ${levelBar[s.level] ?? "bg-border-strong"}`}
-            />
-          ))}
-        </div>
-        <div className="flex gap-8">
-          <Stat value={`${mastered}/${sections.length}`} label="mastered (L3)" />
-          <Stat value={String(dueCount)} label="due now" />
-          <Stat
-            value={`${Math.round(
-              (sections.reduce((s, x) => s + (x.level - 1), 0) /
-                (sections.length * 2 || 1)) *
-                100,
-            )}%`}
-            label="overall"
-          />
-        </div>
-      </section>
-
       {/* Floating section navigator — jump to any section from anywhere */}
       {navOpen && (
         <>
@@ -206,16 +204,5 @@ export function SectionBoard({
         {navOpen ? <X size={20} /> : <List size={20} />}
       </button>
     </>
-  );
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex items-baseline gap-2">
-      <span className="font-mono text-display text-[22px] leading-none">
-        {value}
-      </span>
-      <Label>{label}</Label>
-    </div>
   );
 }
