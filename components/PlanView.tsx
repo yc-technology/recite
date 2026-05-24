@@ -82,6 +82,13 @@ export function PlanView({
                 </ul>
               )}
 
+              <div className="pl-11 space-y-2">
+                <Label className="!text-success">Optimized</Label>
+                <p className="text-primary text-[15px] leading-[1.6] whitespace-pre-wrap">
+                  {sec.optimized}
+                </p>
+              </div>
+
               <details className="pl-11 group">
                 <summary className="label cursor-pointer hover:text-primary list-none">
                   ▸ Original

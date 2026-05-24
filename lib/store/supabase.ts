@@ -22,7 +22,8 @@ export const supabaseStore: Store = {
       presentation_id: presentationId,
       order_index: i,
       title: s.title,
-      content: s.text, // cleaned original
+      content: s.text, // cleaned original (原版)
+      optimized: s.optimized, // polished rewrite (优化版)
       summary: s.summary,
       key_points: s.keyPoints,
       difficulty: s.difficulty,
@@ -83,6 +84,7 @@ export const supabaseStore: Store = {
         sections: (segs ?? []).map((s) => ({
           title: s.title,
           text: s.content,
+          optimized: s.optimized || s.content,
           summary: s.summary ?? "",
           keyPoints: s.key_points ?? [],
           difficulty: s.difficulty,

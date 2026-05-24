@@ -35,6 +35,7 @@ export default async function PracticePage({
             summary: sec.summary,
             keyPoints: sec.keyPoints,
             text: sec.text,
+            optimized: sec.optimized,
             level: p.masteryLevel,
           }
         : null;

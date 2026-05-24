@@ -9,13 +9,18 @@ import { configureSdk, modelOption } from "./runtime";
 
 const INSTRUCTIONS = `You are an English presentation coach. You receive a JSON array of
 presentation sections, each with an index, a title, and text. For EACH section, in the
-SAME ORDER, produce comprehension aids that help the speaker recite it from understanding
-(not by rote): a one-sentence summary of what the section is about, 3-5 concise key points
-the speaker must convey, and a difficulty rating.
+SAME ORDER, produce:
+- "summary": one sentence on what the section is about.
+- "keyPoints": 3-5 concise points the speaker must convey.
+- "difficulty": "easy" | "medium" | "hard" for reciting it from understanding.
+- "optimized": a polished, presentation-ready rewrite of the section in natural, fluent,
+  native English. Improve clarity, flow, word choice, and spoken delivery while preserving
+  the speaker's meaning and intent. Keep it roughly the same length — it must be deliverable
+  aloud as a real presentation. Do NOT add new facts.
 
 Respond with ONLY a single JSON object of exactly this shape:
-{ "enrichments": [ { "summary": string, "keyPoints": string[], "difficulty": "easy" | "medium" | "hard" } ] }
-Return EXACTLY one enrichment per input section, in the same order. Do not echo the text.`;
+{ "enrichments": [ { "summary": string, "keyPoints": string[], "difficulty": "easy" | "medium" | "hard", "optimized": string } ] }
+Return EXACTLY one enrichment per input section, in the same order.`;
 
 export async function analyzeSections(
   sections: NormalizedSection[],
@@ -41,10 +46,12 @@ export async function analyzeSections(
       summary: "",
       keyPoints: [],
       difficulty: "medium" as const,
+      optimized: s.text,
     };
     return {
       title: s.title,
       text: s.text,
+      optimized: e.optimized || s.text, // fall back to original if model omits
       summary: e.summary,
       keyPoints: e.keyPoints,
       difficulty: e.difficulty,

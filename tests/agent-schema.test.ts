@@ -18,7 +18,12 @@ describe("EnrichmentsSchema", () => {
   it("accepts per-section enrichments", () => {
     const ok = EnrichmentsSchema.safeParse({
       enrichments: [
-        { summary: "Greeting and topic.", keyPoints: ["greet", "topic"], difficulty: "easy" },
+        {
+          summary: "Greeting and topic.",
+          keyPoints: ["greet", "topic"],
+          difficulty: "easy",
+          optimized: "Good morning, everyone.",
+        },
       ],
     });
     expect(ok.success).toBe(true);
@@ -32,6 +37,7 @@ describe("StudyPlanSchema", () => {
         {
           title: "Intro",
           text: "Hi everyone.",
+          optimized: "Hello, everyone.",
           summary: "Opening greeting.",
           keyPoints: ["greeting"],
           difficulty: "easy",

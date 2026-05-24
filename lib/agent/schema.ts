@@ -18,6 +18,7 @@ export const EnrichmentSchema = z.object({
   summary: z.string(),
   keyPoints: z.array(z.string()),
   difficulty: z.enum(["easy", "medium", "hard"]),
+  optimized: z.string(), // polished, presentation-ready rewrite of this section
 });
 export const EnrichmentsSchema = z.object({
   enrichments: z.array(EnrichmentSchema),
@@ -26,7 +27,8 @@ export const EnrichmentsSchema = z.object({
 // ── Merged section (what the app stores and renders) ──────────────────
 export const SectionSchema = z.object({
   title: z.string(),
-  text: z.string(), // cleaned original — shown for comparison
+  text: z.string(), // cleaned original (原版) — shown for comparison
+  optimized: z.string(), // polished presentation-ready rewrite (优化版)
   summary: z.string(),
   keyPoints: z.array(z.string()),
   difficulty: z.enum(["easy", "medium", "hard"]),

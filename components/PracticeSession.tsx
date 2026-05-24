@@ -10,7 +10,8 @@ export type DueSection = {
   title: string;
   summary: string;
   keyPoints: string[];
-  text: string;
+  text: string; // original (原版)
+  optimized: string; // polished rewrite (优化版)
   level: number; // mastery level 1..3 (1 = most scaffolding)
 };
 
@@ -155,8 +156,14 @@ export function PracticeSession({
               </ul>
             </div>
             <div className="space-y-1">
-              <Label>Original</Label>
+              <Label className="!text-success">Optimized</Label>
               <p className="font-grotesk text-primary text-[16px] leading-[1.6] whitespace-pre-wrap">
+                {current.optimized}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <Label>Your original</Label>
+              <p className="font-grotesk text-secondary text-[15px] leading-[1.6] whitespace-pre-wrap">
                 {current.text}
               </p>
             </div>
