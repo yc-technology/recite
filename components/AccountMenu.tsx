@@ -24,7 +24,11 @@ export function AccountMenu() {
   const initial = (email[0] ?? "?").toUpperCase();
 
   return (
-    <div className="relative">
+    <div className="flex items-center gap-6">
+      <Link href="/upload" className="label hover:text-primary">
+        + NEW
+      </Link>
+      <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Account menu"
@@ -58,6 +62,7 @@ export function AccountMenu() {
           </div>
         </>
       )}
+      </div>
     </div>
   );
 }
