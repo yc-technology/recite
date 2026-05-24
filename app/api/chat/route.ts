@@ -59,14 +59,19 @@ export async function POST(req: NextRequest) {
   }
   const { presentationId, sectionIndex, section, messages } = parsed.data;
 
-  const reply = await coachReply(section, messages);
+  try {
+    const reply = await coachReply(section, messages);
 
-  // Persist only the new turn (the last user message + this reply).
-  const lastUser = messages[messages.length - 1];
-  await appendChat(presentationId, user.id, sectionIndex, [
-    lastUser,
-    { role: "assistant", content: reply },
-  ]);
+    // Persist only the new turn (the last user message + this reply).
+    const lastUser = messages[messages.length - 1];
+    await appendChat(presentationId, user.id, sectionIndex, [
+      lastUser,
+      { role: "assistant", content: reply },
+    ]);
 
-  return NextResponse.json({ reply });
+    return NextResponse.json({ reply });
+  } catch (e) {
+    console.error("chat failed:", e);
+    return NextResponse.json({ error: "chat failed" }, { status: 502 });
+  }
 }

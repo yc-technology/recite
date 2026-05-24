@@ -29,22 +29,27 @@ export async function POST(req: NextRequest) {
   }
   const { title, sourceType, sections } = parsed.data;
 
-  const plan = await analyzeSections(sections);
-  const now = new Date();
-  const practice: PracticeState[] = plan.sections.map((_, i) => ({
-    ...initialCard(now),
-    segmentIndex: i,
-    masteryLevel: 1,
-  }));
-  const rawText = sections.map((s) => s.text).join("\n\n");
+  try {
+    const plan = await analyzeSections(sections);
+    const now = new Date();
+    const practice: PracticeState[] = plan.sections.map((_, i) => ({
+      ...initialCard(now),
+      segmentIndex: i,
+      masteryLevel: 1,
+    }));
+    const rawText = sections.map((s) => s.text).join("\n\n");
 
-  const rec = await supabaseStore.create({
-    userId: user.id,
-    title,
-    rawText,
-    sourceType,
-    plan,
-    practice,
-  });
-  return NextResponse.json({ id: rec.id });
+    const rec = await supabaseStore.create({
+      userId: user.id,
+      title,
+      rawText,
+      sourceType,
+      plan,
+      practice,
+    });
+    return NextResponse.json({ id: rec.id });
+  } catch (e) {
+    console.error("analyze failed:", e);
+    return NextResponse.json({ error: "analysis failed" }, { status: 502 });
+  }
 }

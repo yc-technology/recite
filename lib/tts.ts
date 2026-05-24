@@ -56,19 +56,3 @@ export function makeUtterance(text: string): SpeechSynthesisUtterance {
 export function supportsTTS(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
-
-export function speak(text: string) {
-  if (!supportsTTS()) return;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(makeUtterance(stripMarkdown(text)));
-}
-
-export function pauseSpeak() {
-  if (supportsTTS()) window.speechSynthesis.pause();
-}
-export function resumeSpeak() {
-  if (supportsTTS()) window.speechSynthesis.resume();
-}
-export function stopSpeak() {
-  if (supportsTTS()) window.speechSynthesis.cancel();
-}

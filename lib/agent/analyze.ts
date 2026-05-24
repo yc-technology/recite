@@ -4,8 +4,35 @@ import {
   StudyPlanSchema,
   type StudyPlan,
   type NormalizedSection,
+  type Enrichment,
 } from "./schema";
 import { configureSdk, modelOption } from "./runtime";
+
+// Merge by index — title/text come from the (clean) input, never the model, so
+// the reference text stays exact even if the model drifts, returns fewer items,
+// or omits the optimized rewrite. Pure + unit-tested.
+export function mergeEnrichments(
+  sections: NormalizedSection[],
+  enrichments: Enrichment[],
+): StudyPlan {
+  const merged = sections.map((s, i) => {
+    const e = enrichments[i] ?? {
+      summary: "",
+      keyPoints: [],
+      difficulty: "medium" as const,
+      optimized: s.text,
+    };
+    return {
+      title: s.title,
+      text: s.text,
+      optimized: e.optimized || s.text, // fall back to original if model omits
+      summary: e.summary,
+      keyPoints: e.keyPoints,
+      difficulty: e.difficulty,
+    };
+  });
+  return StudyPlanSchema.parse({ sections: merged });
+}
 
 const INSTRUCTIONS = `You are an English presentation coach. You receive a JSON array of
 presentation sections, each with an index, a title, and text. For EACH section, in the
@@ -42,24 +69,5 @@ export async function analyzeSections(
   );
   const result = await run(agent, input);
   const { enrichments } = EnrichmentsSchema.parse(result.finalOutput);
-
-  // Merge by index — title/text come from the (clean) input, never the model,
-  // so the reference text stays exact even if the model drifts.
-  const merged = sections.map((s, i) => {
-    const e = enrichments[i] ?? {
-      summary: "",
-      keyPoints: [],
-      difficulty: "medium" as const,
-      optimized: s.text,
-    };
-    return {
-      title: s.title,
-      text: s.text,
-      optimized: e.optimized || s.text, // fall back to original if model omits
-      summary: e.summary,
-      keyPoints: e.keyPoints,
-      difficulty: e.difficulty,
-    };
-  });
-  return StudyPlanSchema.parse({ sections: merged });
+  return mergeEnrichments(sections, enrichments);
 }

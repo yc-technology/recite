@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import { makeUtterance, stripMarkdown, supportsTTS } from "@/lib/tts";
 
 type Ctx = {
@@ -33,12 +34,18 @@ export function useTts() {
 export function TtsProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState(false);
   const [paused, setPaused] = useState(false);
+  const pathname = usePathname();
 
   const stop = useCallback(() => {
     if (supportsTTS()) window.speechSynthesis.cancel();
     setActive(false);
     setPaused(false);
   }, []);
+
+  // Stop playback when navigating to another page.
+  useEffect(() => {
+    stop();
+  }, [pathname, stop]);
 
   const play = useCallback((text: string) => {
     if (!supportsTTS()) return;

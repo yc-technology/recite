@@ -56,7 +56,14 @@ export function SectionChat({
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ presentationId, sectionIndex, section, messages: next }),
+        // Send only the recent turns so long conversations never hit the
+        // server's size cap (the full thread stays in view and persisted).
+        body: JSON.stringify({
+          presentationId,
+          sectionIndex,
+          section,
+          messages: next.slice(-16),
+        }),
       });
       if (!res.ok) throw new Error(`chat failed (${res.status})`);
       const { reply } = await res.json();

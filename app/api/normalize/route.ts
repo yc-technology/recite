@@ -18,6 +18,11 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid input" }, { status: 400 });
   }
-  const normalized = await normalizePresentation(parsed.data.rawText);
-  return NextResponse.json(normalized); // { sections: [{ title, text }] }
+  try {
+    const normalized = await normalizePresentation(parsed.data.rawText);
+    return NextResponse.json(normalized); // { sections: [{ title, text }] }
+  } catch (e) {
+    console.error("normalize failed:", e);
+    return NextResponse.json({ error: "normalize failed" }, { status: 502 });
+  }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { review, Grade } from "@/lib/srs/sm2";
+import { nextLevel } from "@/lib/srs/mastery";
 import { supabaseStore } from "@/lib/store/supabase";
 import { createClient } from "@/lib/supabase/server";
 export const runtime = "nodejs";
@@ -12,14 +13,6 @@ const ReviewSchema = z.object({
   segmentIndex: z.number().int().nonnegative(),
   grade: z.nativeEnum(Grade),
 });
-
-// Scaffold level moves independently of the SM-2 interval: good recall removes
-// hints, a lapse adds them back. Clamped to 1..3.
-function nextLevel(level: number, grade: Grade): number {
-  if (grade === Grade.Again) return Math.max(1, level - 1);
-  if (grade === Grade.Good || grade === Grade.Easy) return Math.min(3, level + 1);
-  return level; // Hard: hold
-}
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
