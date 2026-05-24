@@ -26,6 +26,7 @@ cp .env.example .env.local   # then fill in the values below
 |----------|----------|-------|
 | `OPENAI_API_KEY` | yes | Your OpenAI key. |
 | `OPENAI_BASE_URL` | no | Override the OpenAI endpoint (proxy / OpenAI-compatible gateway). Leave blank for the official API. |
+| `OPENAI_MODEL` | no | Model name. Leave blank to use the SDK default (OpenAI). **Required when using a gateway whose catalog differs** — e.g. `qwen3.6-plus` on Alibaba DashScope. |
 | `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Supabase anon/public key. |
 | `SUPABASE_SERVICE_ROLE_KEY` | no | Reserved for server-only admin tasks. |
