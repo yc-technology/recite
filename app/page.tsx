@@ -13,7 +13,7 @@ export default async function Dashboard() {
   const decks = records.map((r) => ({
     id: r.id,
     title: r.title,
-    total: r.plan.segments.length,
+    total: r.plan.sections.length,
     due: r.practice.filter((p) => new Date(p.dueAt).getTime() <= now).length,
   }));
 

@@ -1,7 +1,10 @@
-import type { StudyPlan, Segment } from "@/lib/agent/schema";
+import type { StudyPlan, Section } from "@/lib/agent/schema";
 import type { SrsCard } from "@/lib/srs/types";
 
-export interface PracticeState extends SrsCard { segmentIndex: number; }
+export interface PracticeState extends SrsCard {
+  segmentIndex: number; // index into plan.sections
+  masteryLevel: number; // 1..3 scaffold level (1 = most hints shown)
+}
 
 export interface PresentationRecord {
   id: string;
@@ -10,7 +13,7 @@ export interface PresentationRecord {
   rawText: string;
   sourceType: string;
   plan: StudyPlan;
-  practice: PracticeState[]; // one per segment
+  practice: PracticeState[]; // one per section
 }
 
 export interface Store {
@@ -20,4 +23,4 @@ export interface Store {
   updatePractice(id: string, userId: string, practice: PracticeState[]): Promise<void>;
 }
 
-export type { StudyPlan, Segment };
+export type { StudyPlan, Section };

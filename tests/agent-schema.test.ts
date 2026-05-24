@@ -1,18 +1,50 @@
 import { describe, it, expect } from "vitest";
-import { StudyPlanSchema } from "@/lib/agent/schema";
+import {
+  StudyPlanSchema,
+  NormalizedSchema,
+  EnrichmentsSchema,
+} from "@/lib/agent/schema";
+
+describe("NormalizedSchema", () => {
+  it("accepts sectioned clean text", () => {
+    const ok = NormalizedSchema.safeParse({
+      sections: [{ title: "Intro", text: "Good morning everyone." }],
+    });
+    expect(ok.success).toBe(true);
+  });
+});
+
+describe("EnrichmentsSchema", () => {
+  it("accepts per-section enrichments", () => {
+    const ok = EnrichmentsSchema.safeParse({
+      enrichments: [
+        { summary: "Greeting and topic.", keyPoints: ["greet", "topic"], difficulty: "easy" },
+      ],
+    });
+    expect(ok.success).toBe(true);
+  });
+});
 
 describe("StudyPlanSchema", () => {
   it("accepts a well-formed plan", () => {
     const ok = StudyPlanSchema.safeParse({
-      segments: [{ title: "Intro", content: "Hi.", difficulty: "easy", hints: ["greeting"] }],
-      dailySchedule: [{ dayIndex: 0, segmentIndexes: [0], taskType: "learn" }],
+      sections: [
+        {
+          title: "Intro",
+          text: "Hi everyone.",
+          summary: "Opening greeting.",
+          keyPoints: ["greeting"],
+          difficulty: "easy",
+        },
+      ],
     });
     expect(ok.success).toBe(true);
   });
   it("rejects bad difficulty", () => {
     const bad = StudyPlanSchema.safeParse({
-      segments: [{ title: "x", content: "y", difficulty: "huge", hints: [] }],
-      dailySchedule: [],
+      sections: [
+        { title: "x", text: "y", summary: "z", keyPoints: [], difficulty: "huge" },
+      ],
     });
     expect(bad.success).toBe(false);
   });

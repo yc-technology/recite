@@ -1,8 +1,4 @@
-import type {
-  Store,
-  PresentationRecord,
-  PracticeState,
-} from "./types";
+import type { Store, PresentationRecord, PracticeState } from "./types";
 import { createClient } from "@/lib/supabase/server";
 
 export const supabaseStore: Store = {
@@ -22,34 +18,17 @@ export const supabaseStore: Store = {
     if (presErr || !pres) throw presErr ?? new Error("insert presentation failed");
     const presentationId = pres.id as string;
 
-    const segRows = input.plan.segments.map((s, i) => ({
+    const segRows = input.plan.sections.map((s, i) => ({
       presentation_id: presentationId,
       order_index: i,
       title: s.title,
-      content: s.content,
+      content: s.text, // cleaned original
+      summary: s.summary,
+      key_points: s.keyPoints,
       difficulty: s.difficulty,
-      hints: s.hints,
     }));
     if (segRows.length) {
       const { error } = await supabase.from("segments").insert(segRows);
-      if (error) throw error;
-    }
-
-    const { data: plan, error: planErr } = await supabase
-      .from("study_plans")
-      .insert({ presentation_id: presentationId, user_id: input.userId, meta: {} })
-      .select("id")
-      .single();
-    if (planErr || !plan) throw planErr ?? new Error("insert study_plan failed");
-
-    const taskRows = input.plan.dailySchedule.map((t) => ({
-      plan_id: plan.id,
-      day_index: t.dayIndex,
-      segment_indexes: t.segmentIndexes,
-      task_type: t.taskType,
-    }));
-    if (taskRows.length) {
-      const { error } = await supabase.from("daily_tasks").insert(taskRows);
       if (error) throw error;
     }
 
@@ -57,6 +36,7 @@ export const supabaseStore: Store = {
       presentation_id: presentationId,
       user_id: input.userId,
       segment_index: p.segmentIndex,
+      mastery_level: p.masteryLevel,
       ease: p.ease,
       interval_days: p.intervalDays,
       repetitions: p.repetitions,
@@ -87,20 +67,6 @@ export const supabaseStore: Store = {
       .eq("presentation_id", id)
       .order("order_index", { ascending: true });
 
-    const { data: plan } = await supabase
-      .from("study_plans")
-      .select("id")
-      .eq("presentation_id", id)
-      .maybeSingle();
-
-    const { data: tasks } = plan
-      ? await supabase
-          .from("daily_tasks")
-          .select("*")
-          .eq("plan_id", plan.id)
-          .order("day_index", { ascending: true })
-      : { data: [] as any[] };
-
     const { data: practice } = await supabase
       .from("practice_records")
       .select("*")
@@ -114,20 +80,17 @@ export const supabaseStore: Store = {
       rawText: pres.raw_text,
       sourceType: pres.source_type,
       plan: {
-        segments: (segs ?? []).map((s) => ({
+        sections: (segs ?? []).map((s) => ({
           title: s.title,
-          content: s.content,
+          text: s.content,
+          summary: s.summary ?? "",
+          keyPoints: s.key_points ?? [],
           difficulty: s.difficulty,
-          hints: s.hints ?? [],
-        })),
-        dailySchedule: (tasks ?? []).map((t) => ({
-          dayIndex: t.day_index,
-          segmentIndexes: t.segment_indexes ?? [],
-          taskType: t.task_type,
         })),
       },
       practice: (practice ?? []).map((p) => ({
         segmentIndex: p.segment_index,
+        masteryLevel: p.mastery_level ?? 1,
         ease: p.ease,
         intervalDays: p.interval_days,
         repetitions: p.repetitions,
@@ -157,6 +120,7 @@ export const supabaseStore: Store = {
       const { error } = await supabase
         .from("practice_records")
         .update({
+          mastery_level: p.masteryLevel,
           ease: p.ease,
           interval_days: p.intervalDays,
           repetitions: p.repetitions,

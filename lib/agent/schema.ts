@@ -1,22 +1,42 @@
 import { z } from "zod";
 
-export const SegmentSchema = z.object({
+// ── Stage 1: normalize ────────────────────────────────────────────────
+// Raw, messy upload text → clean, sectioned data. Structured output (not
+// markdown) so section boundaries are reliable regardless of input style.
+export const NormalizedSectionSchema = z.object({
   title: z.string(),
-  content: z.string(),
+  text: z.string(), // cleaned prose for this section — faithful, no added meaning
+});
+export const NormalizedSchema = z.object({
+  sections: z.array(NormalizedSectionSchema),
+});
+
+// ── Stage 2: analyze ──────────────────────────────────────────────────
+// The agent returns ONLY the added fields, aligned by index, so it can never
+// alter the (already-clean) original text. We merge in code.
+export const EnrichmentSchema = z.object({
+  summary: z.string(),
+  keyPoints: z.array(z.string()),
   difficulty: z.enum(["easy", "medium", "hard"]),
-  hints: z.array(z.string()),
+});
+export const EnrichmentsSchema = z.object({
+  enrichments: z.array(EnrichmentSchema),
 });
 
-export const DailyTaskSchema = z.object({
-  dayIndex: z.number().int().nonnegative(),
-  segmentIndexes: z.array(z.number().int().nonnegative()),
-  taskType: z.enum(["learn", "review"]),
+// ── Merged section (what the app stores and renders) ──────────────────
+export const SectionSchema = z.object({
+  title: z.string(),
+  text: z.string(), // cleaned original — shown for comparison
+  summary: z.string(),
+  keyPoints: z.array(z.string()),
+  difficulty: z.enum(["easy", "medium", "hard"]),
 });
-
 export const StudyPlanSchema = z.object({
-  segments: z.array(SegmentSchema),
-  dailySchedule: z.array(DailyTaskSchema),
+  sections: z.array(SectionSchema),
 });
 
+export type Normalized = z.infer<typeof NormalizedSchema>;
+export type NormalizedSection = z.infer<typeof NormalizedSectionSchema>;
+export type Enrichment = z.infer<typeof EnrichmentSchema>;
 export type StudyPlan = z.infer<typeof StudyPlanSchema>;
-export type Segment = z.infer<typeof SegmentSchema>;
+export type Section = z.infer<typeof SectionSchema>;
