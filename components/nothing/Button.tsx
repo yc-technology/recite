@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "outline" | "ghost";
 
 const base =
-  "inline-flex items-center justify-center font-mono uppercase tracking-[0.08em] text-[12px] " +
+  "inline-flex items-center justify-center font-mono uppercase tracking-[0.08em] text-caption " +
   "px-5 py-3 rounded-[4px] disabled:opacity-40 disabled:cursor-not-allowed select-none";
 
 const variants: Record<Variant, string> = {

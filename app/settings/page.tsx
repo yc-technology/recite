@@ -22,7 +22,7 @@ export default async function SettingsPage() {
 
         <Card className="space-y-1">
           <Label>Signed in as</Label>
-          <p className="text-primary font-mono text-[15px] break-all">
+          <p className="text-primary font-mono text-body break-all">
             {user?.email ?? "—"}
           </p>
         </Card>
@@ -30,12 +30,12 @@ export default async function SettingsPage() {
         <Card className="flex items-center justify-between">
           <div className="space-y-1">
             <Label>Appearance</Label>
-            <p className="text-secondary text-[14px]">Light / dark theme</p>
+            <p className="text-secondary text-label">Light / dark theme</p>
           </div>
           <ThemeToggle />
         </Card>
 
-        <LogoutButton className="w-full border border-border-strong rounded-[4px] px-5 py-3 font-mono uppercase tracking-[0.08em] text-[12px] text-accent hover:border-accent">
+        <LogoutButton className="w-full border border-border-strong rounded-[4px] px-5 py-3 font-mono uppercase tracking-[0.08em] text-caption text-accent hover:border-accent">
           Log out
         </LogoutButton>
       </main>

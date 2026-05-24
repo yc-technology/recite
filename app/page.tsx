@@ -38,13 +38,13 @@ export default async function Dashboard() {
               {totalDue}
             </span>
             <Link href={focusHref}>
-              <Button variant="primary" className="px-10 py-5 text-[13px] gap-2">
+              <Button variant="primary" className="px-10 py-5 text-label gap-2">
                 {totalDue > 0 ? "Enter focus" : "Start a deck"}
                 <ArrowRight size={15} />
               </Button>
             </Link>
           </div>
-          <p className="text-secondary text-[15px] max-w-md">
+          <p className="text-secondary text-body max-w-md">
             {totalDue > 0
               ? "Cards waiting across all decks. One session clears the queue."
               : "No reviews queued. Upload a presentation to begin."}

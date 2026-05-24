@@ -5,12 +5,12 @@ import type { Components } from "react-markdown";
 // (presentation-ready) text, which the agent emits as standard markdown.
 const components: Components = {
   p: (props) => (
-    <p className="text-primary text-[15px] leading-[1.65] mb-3 last:mb-0" {...props} />
+    <p className="text-primary text-body leading-[1.65] mb-3 last:mb-0" {...props} />
   ),
   ul: (props) => <ul className="space-y-1.5 mb-3 last:mb-0" {...props} />,
   ol: (props) => <ol className="space-y-1.5 mb-3 last:mb-0 list-decimal pl-5" {...props} />,
   li: (props) => (
-    <li className="text-primary text-[15px] leading-snug flex gap-2 marker:text-accent">
+    <li className="text-primary text-body leading-snug flex gap-2 marker:text-accent">
       <span className="text-accent shrink-0">—</span>
       <span {...props} />
     </li>
@@ -19,7 +19,7 @@ const components: Components = {
   em: (props) => <em className="italic" {...props} />,
   a: (props) => <a className="text-interactive underline" {...props} />,
   code: (props) => (
-    <code className="font-mono text-[13px] text-secondary" {...props} />
+    <code className="font-mono text-label text-secondary" {...props} />
   ),
 };
 

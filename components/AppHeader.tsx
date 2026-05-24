@@ -9,7 +9,7 @@ export function AppHeader() {
     <header className="flex items-center justify-between px-6 md:px-10 py-5 border-b border-border">
       <Link
         href="/"
-        className="font-doto text-display text-[22px] tracking-[-0.03em] leading-none"
+        className="font-doto text-display text-title tracking-[-0.03em] leading-none"
       >
         RECITE
       </Link>

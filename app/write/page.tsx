@@ -97,7 +97,7 @@ export default function WritePage() {
           <h1 className="font-grotesk font-light text-display text-[clamp(2rem,6vw,3rem)] leading-[1.05] tracking-[-0.02em]">
             Write it. Get it fixed.
           </h1>
-          <p className="text-secondary text-[16px]">
+          <p className="text-secondary text-body">
             Draft anything in English — the coach corrects it, shows a better
             version, and you can turn it into a deck to rehearse.
           </p>
@@ -108,7 +108,7 @@ export default function WritePage() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Write or paste your English here…"
-            className="w-full h-48 bg-surface border border-border rounded-[6px] px-4 py-3 text-primary font-grotesk text-[16px] leading-relaxed focus:border-primary outline-none"
+            className="w-full h-48 bg-surface border border-border rounded-[6px] px-4 py-3 text-primary font-grotesk text-body leading-relaxed focus:border-primary outline-none"
           />
 
           <div className="flex flex-wrap gap-6">
@@ -170,7 +170,7 @@ export default function WritePage() {
         {review && (
           <div className="space-y-10 mt-12">
             {review.comment && (
-              <p className="text-secondary text-[15px] leading-relaxed border-l-2 border-accent pl-4">
+              <p className="text-secondary text-body leading-relaxed border-l-2 border-accent pl-4">
                 {review.comment}
               </p>
             )}
@@ -185,14 +185,14 @@ export default function WritePage() {
                       className="border border-border rounded-[6px] p-4 space-y-1.5"
                     >
                       <Label className="!text-warning">{it.type}</Label>
-                      <p className="text-[15px]">
+                      <p className="text-body">
                         <span className="text-accent line-through">
                           {it.excerpt}
                         </span>
                         <span className="text-disabled"> → </span>
                         <span className="text-success">{it.fix}</span>
                       </p>
-                      <p className="text-secondary text-[14px] leading-snug">
+                      <p className="text-secondary text-label leading-snug">
                         {it.explanation}
                       </p>
                     </li>

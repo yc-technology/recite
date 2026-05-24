@@ -109,7 +109,7 @@ export function SectionChat({
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "text-right" : ""}>
                 <span
-                  className={`inline-block text-[15px] leading-relaxed rounded-[6px] px-3 py-2 ${
+                  className={`inline-block text-body leading-relaxed rounded-[6px] px-3 py-2 ${
                     m.role === "user"
                       ? "bg-surface-raised text-primary"
                       : "text-secondary"
@@ -128,7 +128,7 @@ export function SectionChat({
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && send(input)}
               placeholder="Ask about this section…"
-              className="flex-1 bg-surface border border-border rounded-[4px] px-3 py-2 text-primary text-[15px] focus:border-primary outline-none"
+              className="flex-1 bg-surface border border-border rounded-[4px] px-3 py-2 text-primary text-body focus:border-primary outline-none"
             />
             <button
               onClick={() => send(input)}

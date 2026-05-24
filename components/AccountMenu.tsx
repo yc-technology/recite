@@ -38,7 +38,7 @@ export function AccountMenu() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Account menu"
-        className="w-9 h-9 rounded-full border border-border-strong flex items-center justify-center font-mono text-[13px] text-primary hover:border-primary"
+        className="w-9 h-9 rounded-full border border-border-strong flex items-center justify-center font-mono text-label text-primary hover:border-primary"
       >
         {initial}
       </button>
@@ -49,7 +49,7 @@ export function AccountMenu() {
           <div className="absolute right-0 mt-2 w-60 bg-surface border border-border-strong rounded-[8px] p-2 z-20">
             <div className="px-3 py-2 border-b border-border">
               <Label>Signed in</Label>
-              <p className="text-primary text-[13px] font-mono truncate">
+              <p className="text-primary text-label font-mono truncate">
                 {email}
               </p>
             </div>
@@ -60,12 +60,12 @@ export function AccountMenu() {
             <Link
               href="/settings"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-primary text-[14px] hover:bg-surface-raised rounded-[4px]"
+              className="flex items-center gap-2 px-3 py-2 text-primary text-label hover:bg-surface-raised rounded-[4px]"
             >
               <Settings size={15} />
               Settings
             </Link>
-            <LogoutButton className="w-full flex items-center gap-2 text-left px-3 py-2 text-accent text-[14px] hover:bg-surface-raised rounded-[4px]">
+            <LogoutButton className="w-full flex items-center gap-2 text-left px-3 py-2 text-accent text-label hover:bg-surface-raised rounded-[4px]">
               <LogOut size={15} />
               Log out
             </LogoutButton>

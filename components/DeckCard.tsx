@@ -41,7 +41,7 @@ export function DeckCard({
         onClick={() => router.push(`/presentation/${id}`)}
         className="text-left min-w-0 flex-1"
       >
-        <h3 className="font-grotesk font-medium text-primary text-[17px] truncate">
+        <h3 className="font-grotesk font-medium text-primary text-subtitle truncate">
           {title}
         </h3>
         <Label>{total} sections</Label>
@@ -50,7 +50,7 @@ export function DeckCard({
       <div className="flex items-center gap-5 shrink-0">
         <div className="flex items-baseline gap-2">
           <span
-            className={`font-mono text-[28px] leading-none ${due > 0 ? "text-accent" : "text-disabled"}`}
+            className={`font-mono text-metric leading-none ${due > 0 ? "text-accent" : "text-disabled"}`}
           >
             {due}
           </span>

@@ -109,10 +109,10 @@ export default function LoginPage() {
         </div>
         {insecure && (
           <div className="border border-accent rounded-[4px] px-4 py-3 space-y-1">
-            <p className="font-mono text-[12px] text-accent">
+            <p className="font-mono text-caption text-accent">
               [ INSECURE ORIGIN ]
             </p>
-            <p className="text-secondary text-[13px] leading-relaxed">
+            <p className="text-secondary text-label leading-relaxed">
               Sign-in needs HTTPS. This page is served over plain HTTP, so the
               browser blocks the crypto auth requires. Open it via{" "}
               <span className="text-primary font-mono">localhost</span> or an{" "}
@@ -129,12 +129,12 @@ export default function LoginPage() {
               name="email"
               autoComplete="email"
               onChange={() => setErrors((e) => ({ ...e, email: undefined }))}
-              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-[16px] focus:border-primary outline-none ${
+              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-body focus:border-primary outline-none ${
                 errors.email ? "border-accent" : "border-border"
               }`}
             />
             {errors.email && (
-              <p className="font-mono text-[11px] text-accent">{errors.email}</p>
+              <p className="font-mono text-caption text-accent">{errors.email}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -146,12 +146,12 @@ export default function LoginPage() {
               autoComplete="current-password"
               onChange={() => setErrors((e) => ({ ...e, password: undefined }))}
               onKeyDown={(e) => e.key === "Enter" && run("in")}
-              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-[16px] focus:border-primary outline-none ${
+              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-body focus:border-primary outline-none ${
                 errors.password ? "border-accent" : "border-border"
               }`}
             />
             {errors.password && (
-              <p className="font-mono text-[11px] text-accent">
+              <p className="font-mono text-caption text-accent">
                 {errors.password}
               </p>
             )}

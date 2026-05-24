@@ -152,7 +152,7 @@ export function PracticeSession({
       </div>
 
       <div className="min-h-[34vh] space-y-6">
-        <p className="font-grotesk text-display text-[24px] leading-snug">
+        <p className="font-grotesk text-display text-title leading-snug">
           {current.title}
         </p>
         <Label className="!text-accent">{levelHint[level]}</Label>
@@ -160,7 +160,7 @@ export function PracticeSession({
         {level <= 2 && current.summary && (
           <div className="space-y-1">
             <Label>Gist</Label>
-            <p className="text-secondary text-[17px] leading-relaxed">
+            <p className="text-secondary text-subtitle leading-relaxed">
               {current.summary}
             </p>
           </div>
@@ -170,7 +170,7 @@ export function PracticeSession({
             <Label>Key points</Label>
             <ul className="space-y-1.5">
               {current.keyPoints.map((kp, i) => (
-                <li key={i} className="flex gap-2 text-primary text-[17px]">
+                <li key={i} className="flex gap-2 text-primary text-subtitle">
                   <span className="text-accent shrink-0">—</span>
                   <span>{kp}</span>
                 </li>
@@ -195,7 +195,7 @@ export function PracticeSession({
                       onClick={() =>
                         setChecked((c) => c.map((v, j) => (j === i ? !v : v)))
                       }
-                      className="flex gap-2 text-left text-[17px] w-full hover:text-primary items-start"
+                      className="flex gap-2 text-left text-subtitle w-full hover:text-primary items-start"
                     >
                       <span className={`mt-1 shrink-0 ${checked[i] ? "text-success" : "text-disabled"}`}>
                         {checked[i] ? <CheckSquare size={17} /> : <Square size={17} />}
@@ -214,7 +214,7 @@ export function PracticeSession({
             </div>
             <div className="space-y-1">
               <Label>Your original</Label>
-              <p className="font-grotesk text-secondary text-[16px] leading-[1.6] whitespace-pre-wrap">
+              <p className="font-grotesk text-secondary text-body leading-[1.6] whitespace-pre-wrap">
                 {current.text}
               </p>
             </div>
@@ -285,7 +285,7 @@ function Summary({
   return (
     <div className="space-y-10 py-10">
       <div className="text-center space-y-3">
-        <p className="font-mono text-display text-[20px] tracking-[0.06em]">
+        <p className="font-mono text-display text-title tracking-[0.06em]">
           [ SESSION COMPLETE ]
         </p>
         <div className="flex justify-center gap-8 pt-4">
@@ -302,7 +302,7 @@ function Summary({
             className="flex items-center justify-between border-b border-border py-2"
           >
             <span className={`label ${color}`}>{label}</span>
-            <span className="font-mono text-primary text-[15px]">{n}</span>
+            <span className="font-mono text-primary text-body">{n}</span>
           </div>
         ))}
       </div>
@@ -319,7 +319,7 @@ function Summary({
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="font-mono text-display text-[32px] leading-none">
+      <span className="font-mono text-display text-metric leading-none">
         {value}
       </span>
       <Label>{label}</Label>
@@ -330,7 +330,7 @@ function Stat({ value, label }: { value: string; label: string }) {
 function Empty({ line, id }: { line: string; id: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-24 text-center">
-      <p className="font-mono text-display text-[20px] tracking-[0.06em]">
+      <p className="font-mono text-display text-title tracking-[0.06em]">
         {line}
       </p>
       <Link href={`/presentation/${id}`}>

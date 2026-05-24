@@ -24,6 +24,19 @@
   --font-grotesk: "Space Grotesk", "DM Sans", system-ui, sans-serif;
   --font-mono: "Space Mono", "JetBrains Mono", "SF Mono", monospace;
   --font-doto: "Doto", "Space Mono", monospace;
+
+  /*
+    Semantic type scale — name by ROLE, not size. Components use these
+    (text-body, text-title, …) instead of hardcoded text-[Npx]; tune sizes here.
+    NB: "display/primary/secondary/accent" are color tokens, so the biggest size
+    role is named `metric` to avoid the text-* utility name clash.
+  */
+  --text-caption: 13px;  /* meta / mono labels / numbers / fine print */
+  --text-label: 15px;    /* secondary UI / inputs / list rows */
+  --text-body: 17px;     /* default reading text */
+  --text-subtitle: 20px; /* card titles / sub-headings */
+  --text-title: 24px;    /* section + page titles, practice prompt, logo */
+  --text-metric: 36px;   /* large numbers / counts / timers */
 }
 
 /* Dark mode — the default canvas (OLED black, glowing data). */
@@ -95,7 +108,7 @@ body {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 13px;
+  font-size: var(--text-label);
   line-height: 1.3;
   color: var(--secondary);
 }

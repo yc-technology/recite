@@ -92,10 +92,10 @@ export function SectionBoard({
                 className="space-y-3 scroll-mt-6"
               >
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-secondary text-[13px] w-7 shrink-0">
+                  <span className="font-mono text-secondary text-label w-7 shrink-0">
                     {String(sec.index + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="font-grotesk font-medium text-primary text-[20px] flex-1">
+                  <h3 className="font-grotesk font-medium text-primary text-title flex-1">
                     {sec.title}
                   </h3>
                   {sec.due && (
@@ -112,7 +112,7 @@ export function SectionBoard({
                 </div>
 
                 {sec.summary && (
-                  <p className="text-secondary text-[16px] leading-relaxed">
+                  <p className="text-secondary text-body leading-relaxed">
                     {sec.summary}
                   </p>
                 )}
@@ -121,7 +121,7 @@ export function SectionBoard({
                     {sec.keyPoints.map((kp, ki) => (
                       <li
                         key={ki}
-                        className="flex gap-2 text-primary text-[16px] leading-snug"
+                        className="flex gap-2 text-primary text-body leading-snug"
                       >
                         <span className="text-accent shrink-0">—</span>
                         <span>{kp}</span>
@@ -143,7 +143,7 @@ export function SectionBoard({
                     />
                     Original
                   </summary>
-                  <p className="mt-2 text-secondary text-[13px] font-mono leading-relaxed whitespace-pre-wrap">
+                  <p className="mt-2 text-secondary text-label font-mono leading-relaxed whitespace-pre-wrap">
                     {sec.text}
                   </p>
                 </details>
@@ -182,10 +182,10 @@ export function SectionBoard({
                 onClick={() => jumpTo(s.index)}
                 className="w-full flex items-center gap-3 text-left px-3 py-2 hover:bg-surface-raised rounded-[4px]"
               >
-                <span className="font-mono text-secondary text-[12px] w-6 shrink-0">
+                <span className="font-mono text-secondary text-caption w-6 shrink-0">
                   {String(s.index + 1).padStart(2, "0")}
                 </span>
-                <span className="text-primary text-[14px] truncate flex-1">
+                <span className="text-primary text-label truncate flex-1">
                   {s.title}
                 </span>
                 {s.due && (

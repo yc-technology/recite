@@ -95,7 +95,7 @@ export default function UploadPage() {
           <h1 className="font-grotesk font-light text-display text-[clamp(2rem,6vw,3rem)] leading-[1.05] tracking-[-0.02em]">
             Drop your presentation.
           </h1>
-          <p className="text-secondary text-[16px] max-w-md">
+          <p className="text-secondary text-body max-w-md">
             PDF, PPTX, Markdown, or text. We clean it up, split it into sections,
             and you review before the coach builds your plan.
           </p>
@@ -138,7 +138,7 @@ export default function UploadPage() {
                   className="space-y-2 border border-border rounded-[6px] p-4"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-secondary text-[12px] w-7">
+                    <span className="font-mono text-secondary text-caption w-7">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <input
@@ -155,7 +155,7 @@ export default function UploadPage() {
                     </button>
                   </div>
                   <textarea
-                    className="w-full h-32 bg-surface border border-border rounded-[4px] px-3 py-2 text-primary font-mono text-[15px] leading-relaxed focus:border-primary outline-none"
+                    className="w-full h-32 bg-surface border border-border rounded-[4px] px-3 py-2 text-primary font-mono text-body leading-relaxed focus:border-primary outline-none"
                     value={s.text}
                     onChange={(e) => updateSection(i, { text: e.target.value })}
                   />
@@ -179,11 +179,11 @@ export default function UploadPage() {
                       }`}
                     >
                       <div
-                        className={`font-grotesk font-medium text-[15px] ${active ? "text-primary" : "text-secondary"}`}
+                        className={`font-grotesk font-medium text-body ${active ? "text-primary" : "text-secondary"}`}
                       >
                         {s.label}
                       </div>
-                      <div className="text-secondary text-[12px] leading-snug mt-0.5">
+                      <div className="text-secondary text-caption leading-snug mt-0.5">
                         {s.hint}
                       </div>
                     </button>
