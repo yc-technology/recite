@@ -1,8 +1,7 @@
-// Browser text-to-speech helper. The default voice is often robotic or the
-// wrong locale; we pick the most natural available English voice, and wait for
-// voices to load (they arrive asynchronously on first use).
+// Browser text-to-speech helpers. The default voice is often robotic or the
+// wrong locale; we pick the most natural available English voice.
 
-function stripMarkdown(s: string): string {
+export function stripMarkdown(s: string): string {
   return s
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/[#*_`>~]/g, " ")
@@ -12,7 +11,15 @@ function stripMarkdown(s: string): string {
     .trim();
 }
 
-// Prefer known high-quality natural voices, then any en-US, then any English.
+// Split cleaned text into sentences for per-sentence playback.
+export function splitSentences(text: string): string[] {
+  const clean = stripMarkdown(text);
+  if (!clean) return [];
+  return (clean.match(/[^.!?]+[.!?]*/g) ?? [])
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 const PREFERRED = [
   "Google US English",
   "Samantha",
@@ -25,7 +32,8 @@ const PREFERRED = [
   "Google UK English Female",
 ];
 
-function pickVoice(): SpeechSynthesisVoice | undefined {
+export function pickVoice(): SpeechSynthesisVoice | undefined {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   const voices = window.speechSynthesis.getVoices();
   const en = voices.filter((v) => v.lang?.toLowerCase().startsWith("en"));
   for (const name of PREFERRED) {
@@ -35,28 +43,32 @@ function pickVoice(): SpeechSynthesisVoice | undefined {
   return en.find((v) => v.lang.toLowerCase() === "en-us") || en[0] || voices[0];
 }
 
+export function makeUtterance(text: string): SpeechSynthesisUtterance {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 1;
+  u.pitch = 1;
+  const v = pickVoice();
+  if (v) u.voice = v;
+  return u;
+}
+
 export function supportsTTS(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
 export function speak(text: string) {
   if (!supportsTTS()) return;
-  const synth = window.speechSynthesis;
-  synth.cancel();
-
-  // Speak immediately on the user gesture. Gating on async voice load breaks on
-  // iOS (voiceschanged often never fires) and would play nothing; if no preferred
-  // voice is ready yet, the platform default is used.
-  const u = new SpeechSynthesisUtterance(stripMarkdown(text));
-  u.lang = "en-US";
-  u.rate = 1;
-  u.pitch = 1;
-  const v = pickVoice();
-  if (v) u.voice = v;
-  synth.speak(u);
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(makeUtterance(stripMarkdown(text)));
 }
 
+export function pauseSpeak() {
+  if (supportsTTS()) window.speechSynthesis.pause();
+}
+export function resumeSpeak() {
+  if (supportsTTS()) window.speechSynthesis.resume();
+}
 export function stopSpeak() {
-  if (typeof window !== "undefined" && "speechSynthesis" in window)
-    window.speechSynthesis.cancel();
+  if (supportsTTS()) window.speechSynthesis.cancel();
 }

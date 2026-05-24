@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card, Label } from "@/components/nothing";
-import { Markdown } from "@/components/Markdown";
+import { SentencePlayer } from "@/components/SentencePlayer";
 
 export type SectionView = {
   index: number;
@@ -100,7 +100,7 @@ export function SectionBoard({
                   <span className="font-mono text-secondary text-[13px] w-7 shrink-0">
                     {String(sec.index + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="font-grotesk font-medium text-primary text-[18px] flex-1">
+                  <h3 className="font-grotesk font-medium text-primary text-[20px] flex-1">
                     {sec.title}
                   </h3>
                   {sec.due && (
@@ -117,7 +117,7 @@ export function SectionBoard({
                 </div>
 
                 {sec.summary && (
-                  <p className="text-secondary text-[14px] leading-relaxed pl-10">
+                  <p className="text-secondary text-[16px] leading-relaxed pl-10">
                     {sec.summary}
                   </p>
                 )}
@@ -126,7 +126,7 @@ export function SectionBoard({
                     {sec.keyPoints.map((kp, ki) => (
                       <li
                         key={ki}
-                        className="flex gap-2 text-primary text-[14px] leading-snug"
+                        className="flex gap-2 text-primary text-[16px] leading-snug"
                       >
                         <span className="text-accent shrink-0">—</span>
                         <span>{kp}</span>
@@ -136,8 +136,8 @@ export function SectionBoard({
                 )}
 
                 <div className="pl-10 space-y-2">
-                  <Label className="!text-success">Optimized</Label>
-                  <Markdown>{sec.optimized}</Markdown>
+                  <Label className="!text-success">Optimized · tap a line to hear it</Label>
+                  <SentencePlayer text={sec.optimized} />
                 </div>
 
                 <details className="pl-10">

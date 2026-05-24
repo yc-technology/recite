@@ -116,7 +116,7 @@ export default function LoginPage() {
               name="email"
               autoComplete="email"
               onChange={() => setErrors((e) => ({ ...e, email: undefined }))}
-              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none ${
+              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-[16px] focus:border-primary outline-none ${
                 errors.email ? "border-accent" : "border-border"
               }`}
             />
@@ -133,7 +133,7 @@ export default function LoginPage() {
               autoComplete="current-password"
               onChange={() => setErrors((e) => ({ ...e, password: undefined }))}
               onKeyDown={(e) => e.key === "Enter" && run("in")}
-              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none ${
+              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-[16px] focus:border-primary outline-none ${
                 errors.password ? "border-accent" : "border-border"
               }`}
             />

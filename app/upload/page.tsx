@@ -145,7 +145,7 @@ export default function UploadPage() {
                     </button>
                   </div>
                   <textarea
-                    className="w-full h-32 bg-surface border border-border rounded-[4px] px-3 py-2 text-primary font-mono text-[13px] leading-relaxed focus:border-primary outline-none"
+                    className="w-full h-32 bg-surface border border-border rounded-[4px] px-3 py-2 text-primary font-mono text-[15px] leading-relaxed focus:border-primary outline-none"
                     value={s.text}
                     onChange={(e) => updateSection(i, { text: e.target.value })}
                   />

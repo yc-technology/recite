@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Grade } from "@/lib/srs/sm2";
-import { speak, stopSpeak } from "@/lib/tts";
+import { stopSpeak } from "@/lib/tts";
 import { Button, Label } from "@/components/nothing";
-import { Markdown } from "@/components/Markdown";
+import { SentencePlayer } from "@/components/SentencePlayer";
 import { SectionChat } from "@/components/SectionChat";
 import { useNotify } from "@/components/Notify";
 
@@ -150,7 +150,7 @@ export function PracticeSession({
       </div>
 
       <div className="min-h-[34vh] space-y-6">
-        <p className="font-grotesk text-display text-[20px] leading-snug">
+        <p className="font-grotesk text-display text-[24px] leading-snug">
           {current.title}
         </p>
         <Label className="!text-accent">{levelHint[level]}</Label>
@@ -158,7 +158,7 @@ export function PracticeSession({
         {level <= 2 && current.summary && (
           <div className="space-y-1">
             <Label>Gist</Label>
-            <p className="text-secondary text-[15px] leading-relaxed">
+            <p className="text-secondary text-[17px] leading-relaxed">
               {current.summary}
             </p>
           </div>
@@ -168,7 +168,7 @@ export function PracticeSession({
             <Label>Key points</Label>
             <ul className="space-y-1.5">
               {current.keyPoints.map((kp, i) => (
-                <li key={i} className="flex gap-2 text-primary text-[15px]">
+                <li key={i} className="flex gap-2 text-primary text-[17px]">
                   <span className="text-accent shrink-0">—</span>
                   <span>{kp}</span>
                 </li>
@@ -193,7 +193,7 @@ export function PracticeSession({
                       onClick={() =>
                         setChecked((c) => c.map((v, j) => (j === i ? !v : v)))
                       }
-                      className="flex gap-2 text-left text-[15px] w-full hover:text-primary"
+                      className="flex gap-2 text-left text-[17px] w-full hover:text-primary"
                     >
                       <span className={checked[i] ? "text-success" : "text-disabled"}>
                         {checked[i] ? "☑" : "☐"}
@@ -206,22 +206,13 @@ export function PracticeSession({
                 ))}
               </ul>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-3">
-                <Label className="!text-success">Optimized</Label>
-                <button
-                  onClick={() => speak(current.optimized)}
-                  className="label hover:text-primary"
-                  aria-label="Read optimized aloud"
-                >
-                  🔊 LISTEN
-                </button>
-              </div>
-              <Markdown>{current.optimized}</Markdown>
+            <div className="space-y-2">
+              <Label className="!text-success">Optimized · tap a line to hear it</Label>
+              <SentencePlayer text={current.optimized} />
             </div>
             <div className="space-y-1">
               <Label>Your original</Label>
-              <p className="font-grotesk text-secondary text-[15px] leading-[1.6] whitespace-pre-wrap">
+              <p className="font-grotesk text-secondary text-[16px] leading-[1.6] whitespace-pre-wrap">
                 {current.text}
               </p>
             </div>
