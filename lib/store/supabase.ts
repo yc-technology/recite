@@ -145,12 +145,8 @@ export const supabaseStore: Store = {
       .select("id")
       .order("created_at", { ascending: false });
     const ids = (rows ?? []).map((r) => r.id as string);
-    const records: PresentationRecord[] = [];
-    for (const id of ids) {
-      const rec = await this.get(id, userId);
-      if (rec) records.push(rec);
-    }
-    return records;
+    const records = await Promise.all(ids.map((id) => this.get(id, userId)));
+    return records.filter((r): r is PresentationRecord => r !== null);
   },
 
   async updatePractice(id, userId, practice: PracticeState[]) {
