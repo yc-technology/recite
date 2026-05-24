@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Label } from "@/components/nothing";
@@ -10,7 +9,6 @@ import { useNotify } from "@/components/Notify";
 const REMEMBER_KEY = "recite:email";
 
 export default function LoginPage() {
-  const router = useRouter();
   const notify = useNotify();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -75,8 +73,10 @@ export default function LoginPage() {
         notify("[ CHECK EMAIL TO CONFIRM ]", "info");
         return;
       }
-      router.push("/");
-      router.refresh();
+      // Full-page navigation (not router.push): guarantees the freshly-set auth
+      // cookie is sent on the next request, avoiding a race where edge middleware
+      // sees no session yet and bounces back to /login.
+      window.location.assign("/");
     } catch (e) {
       notify(`[ERROR: ${e instanceof Error ? e.message : "login failed"}]`);
     } finally {
