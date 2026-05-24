@@ -1,14 +1,8 @@
 import Link from "next/link";
 import type { PresentationRecord } from "@/lib/store/types";
-import { Button, Card, Label } from "@/components/nothing";
+import { Button, Label } from "@/components/nothing";
 import { PresentationActions } from "@/components/PresentationActions";
-import { Markdown } from "@/components/Markdown";
-
-const difficultyColor: Record<string, string> = {
-  easy: "text-success",
-  medium: "text-warning",
-  hard: "text-accent",
-};
+import { SectionBoard, type SectionView } from "@/components/SectionBoard";
 
 export function PlanView({
   record,
@@ -18,6 +12,24 @@ export function PlanView({
   dueCount: number;
 }) {
   const { plan } = record;
+  const now = Date.now();
+
+  // Per-section view data: merge content with its practice card (level + due).
+  const byIndex = new Map(record.practice.map((p) => [p.segmentIndex, p]));
+  const sections: SectionView[] = plan.sections.map((sec, i) => {
+    const card = byIndex.get(i);
+    return {
+      index: i,
+      title: sec.title,
+      difficulty: sec.difficulty,
+      summary: sec.summary,
+      keyPoints: sec.keyPoints,
+      optimized: sec.optimized,
+      text: sec.text,
+      level: card?.masteryLevel ?? 1,
+      due: card ? new Date(card.dueAt).getTime() <= now : true,
+    };
+  });
 
   return (
     <div className="space-y-14">
@@ -43,63 +55,7 @@ export function PlanView({
         </div>
       </section>
 
-      {/* Sections: summary + key points, original collapsed for reference */}
-      <section className="space-y-5">
-        <Label>Sections — {plan.sections.length}</Label>
-        <ol className="space-y-3">
-          {plan.sections.map((sec, i) => (
-            <Card key={i} className="space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-secondary text-[13px] w-8 shrink-0">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-grotesk font-medium text-primary text-[18px] flex-1">
-                  {sec.title}
-                </h3>
-                <span
-                  className={`label ${difficultyColor[sec.difficulty] ?? "text-secondary"}`}
-                >
-                  {sec.difficulty}
-                </span>
-              </div>
-
-              {sec.summary && (
-                <p className="text-secondary text-[14px] leading-relaxed pl-11">
-                  {sec.summary}
-                </p>
-              )}
-
-              {sec.keyPoints.length > 0 && (
-                <ul className="pl-11 space-y-1.5">
-                  {sec.keyPoints.map((kp, ki) => (
-                    <li
-                      key={ki}
-                      className="flex gap-2 text-primary text-[14px] leading-snug"
-                    >
-                      <span className="text-accent shrink-0">—</span>
-                      <span>{kp}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              <div className="pl-11 space-y-2">
-                <Label className="!text-success">Optimized</Label>
-                <Markdown>{sec.optimized}</Markdown>
-              </div>
-
-              <details className="pl-11 group">
-                <summary className="label cursor-pointer hover:text-primary list-none">
-                  ▸ Original
-                </summary>
-                <p className="mt-2 text-secondary text-[13px] font-mono leading-relaxed whitespace-pre-wrap">
-                  {sec.text}
-                </p>
-              </details>
-            </Card>
-          ))}
-        </ol>
-      </section>
+      <SectionBoard id={record.id} sections={sections} />
     </div>
   );
 }
