@@ -35,30 +35,25 @@ function pickVoice(): SpeechSynthesisVoice | undefined {
   return en.find((v) => v.lang.toLowerCase() === "en-us") || en[0] || voices[0];
 }
 
+export function supportsTTS(): boolean {
+  return typeof window !== "undefined" && "speechSynthesis" in window;
+}
+
 export function speak(text: string) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  if (!supportsTTS()) return;
   const synth = window.speechSynthesis;
   synth.cancel();
 
-  const run = () => {
-    const u = new SpeechSynthesisUtterance(stripMarkdown(text));
-    u.lang = "en-US";
-    u.rate = 1;
-    u.pitch = 1;
-    const v = pickVoice();
-    if (v) u.voice = v;
-    synth.speak(u);
-  };
-
-  if (synth.getVoices().length === 0) {
-    synth.onvoiceschanged = () => {
-      synth.onvoiceschanged = null;
-      run();
-    };
-    synth.getVoices(); // nudge async load
-  } else {
-    run();
-  }
+  // Speak immediately on the user gesture. Gating on async voice load breaks on
+  // iOS (voiceschanged often never fires) and would play nothing; if no preferred
+  // voice is ready yet, the platform default is used.
+  const u = new SpeechSynthesisUtterance(stripMarkdown(text));
+  u.lang = "en-US";
+  u.rate = 1;
+  u.pitch = 1;
+  const v = pickVoice();
+  if (v) u.voice = v;
+  synth.speak(u);
 }
 
 export function stopSpeak() {
