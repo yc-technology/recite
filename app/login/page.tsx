@@ -17,10 +17,15 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [remember, setRemember] = useState(true);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [insecure, setInsecure] = useState(false);
 
   // Prefill the remembered email on load (password is left to the browser's
   // password manager via autoComplete).
   useEffect(() => {
+    // Auth needs Web Crypto, which browsers disable on non-HTTPS origins that
+    // aren't localhost (e.g. http://<LAN-IP>). Detect and explain instead of
+    // failing silently.
+    setInsecure(!window.isSecureContext);
     try {
       const saved = localStorage.getItem(REMEMBER_KEY);
       if (saved && emailRef.current) {
@@ -46,6 +51,11 @@ export default function LoginPage() {
       errs.password = "At least 6 characters";
     setErrors(errs);
     if (errs.email || errs.password) return;
+
+    if (!window.isSecureContext) {
+      notify("[ERROR: sign-in needs HTTPS — open this page over https or on localhost]");
+      return;
+    }
     try {
       if (remember) localStorage.setItem(REMEMBER_KEY, email);
       else localStorage.removeItem(REMEMBER_KEY);
@@ -84,6 +94,19 @@ export default function LoginPage() {
             Sign in.
           </h1>
         </div>
+        {insecure && (
+          <div className="border border-accent rounded-[4px] px-4 py-3 space-y-1">
+            <p className="font-mono text-[12px] text-accent">
+              [ INSECURE ORIGIN ]
+            </p>
+            <p className="text-secondary text-[13px] leading-relaxed">
+              Sign-in needs HTTPS. This page is served over plain HTTP, so the
+              browser blocks the crypto auth requires. Open it via{" "}
+              <span className="text-primary font-mono">localhost</span> or an{" "}
+              <span className="text-primary font-mono">https://</span> URL.
+            </p>
+          </div>
+        )}
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Email</Label>
