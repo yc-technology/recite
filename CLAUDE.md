@@ -92,6 +92,36 @@ Configured via env: `OPENAI_BASE_URL=https://coding.dashscope.aliyuncs.com/v1`,
 - **Per-user rate limit** on normalize/analyze/write-review (20/10min) and chat (60/10min)
   → 429. All LLM routes require auth; Supabase RLS is owner-only on every table.
 
+## Deploy to Vercel
+
+The project is already linked (`.vercel/project.json` → `sixdjangos-projects/recite`)
+and GitHub-connected, so **pushing to `main` auto-deploys**. Manual deploy:
+`npx vercel --prod --yes`. Stable alias: `recite-nine.vercel.app`.
+
+First-time / re-setup steps (CLI is logged in as `sixdjango`):
+
+1. `npx vercel link --yes` — links/creates the project.
+2. Set env vars for production (repeat per var; values from `.env.local`):
+   `printf '%s' "$VALUE" | npx vercel env add <NAME> production`
+   Required: `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`, `LLM_ALLOWED_EMAILS`,
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+   (`NEXT_PUBLIC_VERCEL_ENV` is auto-exposed by Vercel — used to hide signup in prod.)
+3. `npx vercel --prod --yes`.
+4. **Disable Deployment Protection** — new projects 401 every request behind "Vercel
+   Authentication". Turn it off so the app is public:
+   ```bash
+   TOKEN=$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.env.HOME+'/Library/Application Support/com.vercel.cli/auth.json','utf8')).token)")
+   # projectId/teamId are in .vercel/project.json (projectId / orgId)
+   curl -s -X PATCH "https://api.vercel.com/v9/projects/<projectId>?teamId=<orgId>" \
+     -H "Authorization: Bearer $TOKEN" -H "content-type: application/json" \
+     -d '{"ssoProtection":null}'
+   ```
+   (Or Project Settings → Deployment Protection → disable in the dashboard.)
+5. Apply any new SQL migrations to Supabase (see DB migrations below).
+
+Build is pnpm + Next 16, no env needed at build time (pages are dynamic; the only
+client-prerendered page, `/login`, creates the Supabase client lazily in handlers).
+
 ## Environment variables
 
 `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`, `LLM_ALLOWED_EMAILS`,
