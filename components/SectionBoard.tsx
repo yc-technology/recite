@@ -88,12 +88,12 @@ export function SectionBoard({
                 </div>
 
                 {sec.summary && (
-                  <p className="text-secondary text-[16px] leading-relaxed pl-10">
+                  <p className="text-secondary text-[16px] leading-relaxed">
                     {sec.summary}
                   </p>
                 )}
                 {sec.keyPoints.length > 0 && (
-                  <ul className="pl-10 space-y-1.5">
+                  <ul className="space-y-1.5">
                     {sec.keyPoints.map((kp, ki) => (
                       <li
                         key={ki}
@@ -106,12 +106,12 @@ export function SectionBoard({
                   </ul>
                 )}
 
-                <div className="pl-10 space-y-2">
+                <div className="space-y-2">
                   <Label className="!text-success">Optimized · double-click a paragraph to hear it</Label>
                   <SpeakableMarkdown>{sec.optimized}</SpeakableMarkdown>
                 </div>
 
-                <details className="pl-10 group">
+                <details className="group">
                   <summary className="label cursor-pointer hover:text-primary list-none flex items-center gap-1.5">
                     <ChevronRight
                       size={13}
@@ -124,7 +124,7 @@ export function SectionBoard({
                   </p>
                 </details>
 
-                <div className="pl-10">
+                <div>
                   <button
                     onClick={() =>
                       router.push(`/practice/${id}?sections=${sec.index}`)
