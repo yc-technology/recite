@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { PracticeSession, type DueSection } from "@/components/PracticeSession";
 import { supabaseStore } from "@/lib/store/supabase";
 import { createClient } from "@/lib/supabase/server";
@@ -58,6 +59,13 @@ export default async function PracticePage({
     <>
       <AppHeader />
       <main className="mx-auto w-full max-w-2xl px-6 md:px-10 py-12 md:py-16">
+        <Breadcrumb
+          items={[
+            { label: "Dashboard", href: "/" },
+            { label: record.title, href: `/presentation/${id}` },
+            { label: "Practice" },
+          ]}
+        />
         <PracticeSession id={id} sections={sections} />
       </main>
     </>
