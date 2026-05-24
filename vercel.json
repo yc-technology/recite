@@ -1,6 +1,7 @@
 {
   "functions": {
     "app/api/normalize/route.ts": { "maxDuration": 60 },
-    "app/api/analyze/route.ts": { "maxDuration": 60 }
+    "app/api/analyze/route.ts": { "maxDuration": 60 },
+    "app/api/chat/route.ts": { "maxDuration": 60 }
   }
 }

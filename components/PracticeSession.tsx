@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Grade } from "@/lib/srs/sm2";
 import { Button, Label } from "@/components/nothing";
 import { Markdown } from "@/components/Markdown";
+import { SectionChat } from "@/components/SectionChat";
 
 export type DueSection = {
   index: number;
@@ -23,12 +24,33 @@ const GRADES: { grade: Grade; label: string; variant: "outline" | "primary" }[] 
     { grade: Grade.Good, label: "Good", variant: "outline" },
     { grade: Grade.Easy, label: "Easy", variant: "primary" },
   ];
+const GRADE_KEY = ["again", "hard", "good", "easy"] as const;
 
 const levelHint: Record<number, string> = {
   1: "Explain this section in your own words, using the points below.",
   2: "Recall the key points and explain it — only the gist is shown.",
   3: "From the title alone, recall and explain the whole section.",
 };
+
+function stripMd(s: string): string {
+  return s
+    .replace(/[#*_`>~]/g, " ")
+    .replace(/^\s*[-•]\s*/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function speak(text: string) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(stripMd(text));
+  u.lang = "en-US";
+  u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+function stopSpeak() {
+  if (typeof window !== "undefined" && "speechSynthesis" in window)
+    window.speechSynthesis.cancel();
+}
 
 export function PracticeSession({
   id,
@@ -37,60 +59,109 @@ export function PracticeSession({
   id: string;
   sections: DueSection[];
 }) {
-  const [pos, setPos] = useState(0);
+  const total = sections.length;
+  const [queue, setQueue] = useState<number[]>(() =>
+    sections.map((_, i) => i),
+  );
+  const [finished, setFinished] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [checked, setChecked] = useState<boolean[]>([]);
   const [saving, setSaving] = useState(false);
+  const [counts, setCounts] = useState({ again: 0, hard: 0, good: 0, easy: 0 });
+  const [startedAt] = useState(() => Date.now());
 
-  const current = sections[pos];
+  const curPos = queue[0];
+  const current = curPos != null ? sections[curPos] : undefined;
 
   useEffect(() => {
     setChecked(current ? current.keyPoints.map(() => false) : []);
     setRevealed(false);
-  }, [current]);
+    stopSpeak();
+  }, [curPos]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const coverage = useMemo(
-    () => checked.filter(Boolean).length,
-    [checked],
+  useEffect(() => () => stopSpeak(), []);
+
+  const grade = useCallback(
+    async (g: Grade) => {
+      if (!current || saving) return;
+      setSaving(true);
+      stopSpeak();
+      try {
+        await fetch("/api/practice-review", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ id, segmentIndex: current.index, grade: g }),
+        });
+      } finally {
+        setSaving(false);
+        setCounts((c) => ({ ...c, [GRADE_KEY[g]]: c[GRADE_KEY[g]] + 1 }));
+        setQueue((q) => {
+          const [head, ...rest] = q;
+          // Again: requeue this card to the end of the session; else finish it.
+          return g === Grade.Again ? [...rest, head] : rest;
+        });
+        if (g !== Grade.Again) setFinished((f) => f + 1);
+      }
+    },
+    [current, id, saving],
   );
 
-  if (sections.length === 0) {
+  // Keyboard: Space = reveal, 1-4 = grade. Ignore while typing in chat.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+      if (!current) return;
+      if (e.code === "Space" && !revealed) {
+        e.preventDefault();
+        setRevealed(true);
+      } else if (revealed && !saving && ["1", "2", "3", "4"].includes(e.key)) {
+        grade((Number(e.key) - 1) as Grade);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [revealed, saving, current, grade]);
+
+  if (total === 0) {
     return <Empty line="Nothing due. Inbox zero." id={id} />;
   }
-  if (pos >= sections.length) {
-    return <Empty line="[ SESSION COMPLETE ]" id={id} />;
-  }
-
-  async function grade(g: Grade) {
-    setSaving(true);
-    try {
-      await fetch("/api/practice-review", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ id, segmentIndex: current.index, grade: g }),
-      });
-    } finally {
-      setSaving(false);
-      setPos((p) => p + 1);
-    }
+  if (!current) {
+    return (
+      <Summary
+        id={id}
+        total={total}
+        counts={counts}
+        elapsedMs={Date.now() - startedAt}
+      />
+    );
   }
 
   const level = Math.min(3, Math.max(1, current.level));
+  const coverage = checked.filter(Boolean).length;
+  const pct = Math.round((finished / total) * 100);
 
   return (
-    <div className="space-y-10">
-      <div className="flex items-center justify-between">
-        <Label>
-          {current.title} · L{level}
-        </Label>
-        <Label>
-          {String(pos + 1).padStart(2, "0")} /{" "}
-          {String(sections.length).padStart(2, "0")}
-        </Label>
+    <div className="space-y-8">
+      {/* progress bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label>
+            {current.title} · L{level}
+          </Label>
+          <Label>
+            {finished} / {total}
+          </Label>
+        </div>
+        <div className="h-1.5 rounded-[2px] bg-border overflow-hidden">
+          <div
+            className="h-full bg-accent transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
       </div>
 
-      <div className="min-h-[38vh] space-y-6">
-        {/* Scaffold — fades as mastery level rises */}
+      <div className="min-h-[34vh] space-y-6">
         <p className="font-grotesk text-display text-[20px] leading-snug">
           {current.title}
         </p>
@@ -118,7 +189,6 @@ export function PracticeSession({
           </div>
         )}
 
-        {/* Reveal — checklist self-assessment + original for comparison */}
         {revealed && (
           <div className="space-y-5 pt-2 border-t border-border">
             <div className="space-y-2">
@@ -133,22 +203,14 @@ export function PracticeSession({
                   <li key={i}>
                     <button
                       onClick={() =>
-                        setChecked((c) =>
-                          c.map((v, j) => (j === i ? !v : v)),
-                        )
+                        setChecked((c) => c.map((v, j) => (j === i ? !v : v)))
                       }
                       className="flex gap-2 text-left text-[15px] w-full hover:text-primary"
                     >
-                      <span
-                        className={
-                          checked[i] ? "text-success" : "text-disabled"
-                        }
-                      >
+                      <span className={checked[i] ? "text-success" : "text-disabled"}>
                         {checked[i] ? "☑" : "☐"}
                       </span>
-                      <span
-                        className={checked[i] ? "text-primary" : "text-secondary"}
-                      >
+                      <span className={checked[i] ? "text-primary" : "text-secondary"}>
                         {kp}
                       </span>
                     </button>
@@ -157,7 +219,16 @@ export function PracticeSession({
               </ul>
             </div>
             <div className="space-y-1">
-              <Label className="!text-success">Optimized</Label>
+              <div className="flex items-center gap-3">
+                <Label className="!text-success">Optimized</Label>
+                <button
+                  onClick={() => speak(current.optimized)}
+                  className="label hover:text-primary"
+                  aria-label="Read optimized aloud"
+                >
+                  🔊 LISTEN
+                </button>
+              </div>
               <Markdown>{current.optimized}</Markdown>
             </div>
             <div className="space-y-1">
@@ -176,22 +247,98 @@ export function PracticeSession({
           className="w-full py-4"
           onClick={() => setRevealed(true)}
         >
-          Reveal →
+          Reveal →{"  "}
+          <span className="opacity-60 ml-2">[space]</span>
         </Button>
       ) : (
         <div className="grid grid-cols-4 gap-2">
-          {GRADES.map((g) => (
+          {GRADES.map((g, i) => (
             <Button
               key={g.grade}
               variant={g.variant}
               disabled={saving}
               onClick={() => grade(g.grade)}
             >
-              {g.label}
+              {i + 1} {g.label}
             </Button>
           ))}
         </div>
       )}
+
+      <SectionChat
+        section={{
+          title: current.title,
+          optimized: current.optimized,
+          text: current.text,
+          keyPoints: current.keyPoints,
+        }}
+      />
+    </div>
+  );
+}
+
+function Summary({
+  id,
+  total,
+  counts,
+  elapsedMs,
+}: {
+  id: string;
+  total: number;
+  counts: { again: number; hard: number; good: number; easy: number };
+  elapsedMs: number;
+}) {
+  const mins = Math.floor(elapsedMs / 60000);
+  const secs = Math.floor((elapsedMs % 60000) / 1000);
+  const time = `${mins}:${String(secs).padStart(2, "0")}`;
+  const rows: [string, number, string][] = [
+    ["Easy", counts.easy, "text-success"],
+    ["Good", counts.good, "text-primary"],
+    ["Hard", counts.hard, "text-warning"],
+    ["Again", counts.again, "text-accent"],
+  ];
+
+  return (
+    <div className="space-y-10 py-10">
+      <div className="text-center space-y-3">
+        <p className="font-mono text-display text-[20px] tracking-[0.06em]">
+          [ SESSION COMPLETE ]
+        </p>
+        <div className="flex justify-center gap-8 pt-4">
+          <Stat value={String(total)} label="sections" />
+          <Stat value={time} label="time" />
+        </div>
+      </div>
+
+      <div className="max-w-xs mx-auto space-y-2">
+        <Label>Grades</Label>
+        {rows.map(([label, n, color]) => (
+          <div
+            key={label}
+            className="flex items-center justify-between border-b border-border py-2"
+          >
+            <span className={`label ${color}`}>{label}</span>
+            <span className="font-mono text-primary text-[15px]">{n}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-center">
+        <Link href={`/presentation/${id}`}>
+          <Button variant="outline">Back to plan</Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="font-mono text-display text-[32px] leading-none">
+        {value}
+      </span>
+      <Label>{label}</Label>
     </div>
   );
 }
