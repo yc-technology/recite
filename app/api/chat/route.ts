@@ -3,6 +3,7 @@ import { z } from "zod";
 import { coachReply } from "@/lib/agent/chat";
 import { listChat, appendChat } from "@/lib/store/chat";
 import { createClient } from "@/lib/supabase/server";
+import { rateLimit } from "@/lib/ratelimit";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
@@ -52,6 +53,9 @@ const Body = z.object({
 export async function POST(req: NextRequest) {
   const user = await authed();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!(await rateLimit(user.id, "chat", 60, 600))) {
+    return NextResponse.json({ error: "rate limited — try again later" }, { status: 429 });
+  }
 
   const parsed = Body.safeParse(await req.json());
   if (!parsed.success) {

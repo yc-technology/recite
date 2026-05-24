@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { normalizePresentation } from "@/lib/agent/normalize";
 import { createClient } from "@/lib/supabase/server";
+import { rateLimit } from "@/lib/ratelimit";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
@@ -13,6 +14,9 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!(await rateLimit(user.id, "normalize", 20, 600))) {
+    return NextResponse.json({ error: "rate limited — try again later" }, { status: 429 });
+  }
 
   const parsed = Body.safeParse(await req.json());
   if (!parsed.success) {

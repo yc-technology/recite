@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { analyzeSections } from "@/lib/agent/analyze";
 import { OptimizeStyleSchema } from "@/lib/agent/schema";
+import { rateLimit } from "@/lib/ratelimit";
 import { initialCard } from "@/lib/srs/sm2";
 import { supabaseStore } from "@/lib/store/supabase";
 import { createClient } from "@/lib/supabase/server";
@@ -24,6 +25,9 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!(await rateLimit(user.id, "analyze", 20, 600))) {
+    return NextResponse.json({ error: "rate limited — try again later" }, { status: 429 });
+  }
 
   const parsed = Body.safeParse(await req.json());
   if (!parsed.success) {

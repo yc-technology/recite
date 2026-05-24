@@ -8,6 +8,8 @@ import { Button, Label } from "@/components/nothing";
 import { useNotify } from "@/components/Notify";
 
 const REMEMBER_KEY = "recite:email";
+// Vercel auto-exposes NEXT_PUBLIC_VERCEL_ENV on deployments; absent locally.
+const ALLOW_SIGNUP = !process.env.NEXT_PUBLIC_VERCEL_ENV;
 
 export default function LoginPage() {
   const notify = useNotify();
@@ -61,17 +63,27 @@ export default function LoginPage() {
     } catch {}
     setBusy(true);
     try {
+      // Sign-up runs through our local-only route (admin-creates a confirmed
+      // user); it 403s on deployments. Then we sign in normally below.
+      if (kind === "up") {
+        const res = await fetch("/api/signup", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          notify(`[ERROR: ${data.error ?? "sign-up failed"}]`);
+          return;
+        }
+      }
       const supabase = createClient();
-      const { error } =
-        kind === "in"
-          ? await supabase.auth.signInWithPassword({ email, password })
-          : await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) {
         notify(`[ERROR: ${error.message}]`);
-        return;
-      }
-      if (kind === "up") {
-        notify("[ CHECK EMAIL TO CONFIRM ]", "info");
         return;
       }
       // Full-page navigation (not router.push): guarantees the freshly-set auth
@@ -171,13 +183,15 @@ export default function LoginPage() {
                 </>
               )}
             </Button>
-            <Button
-              variant="outline"
-              disabled={busy}
-              onClick={() => run("up")}
-            >
-              Sign up
-            </Button>
+            {ALLOW_SIGNUP && (
+              <Button
+                variant="outline"
+                disabled={busy}
+                onClick={() => run("up")}
+              >
+                Sign up
+              </Button>
+            )}
           </div>
         </div>
       </main>
