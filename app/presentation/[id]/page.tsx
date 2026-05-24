@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { PlanView } from "@/components/PlanView";
-import { memoryStore } from "@/lib/store/memory";
+import { supabaseStore } from "@/lib/store/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 // Next.js 16: route params are async and must be awaited.
 export default async function PresentationPage({
@@ -10,7 +11,9 @@ export default async function PresentationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const record = await memoryStore.get(id, "local");
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const record = user ? await supabaseStore.get(id, user.id) : null;
   if (!record) notFound();
 
   const now = Date.now();

@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Card, Label } from "@/components/nothing";
-import { memoryStore } from "@/lib/store/memory";
+import { supabaseStore } from "@/lib/store/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function Dashboard() {
-  const records = await memoryStore.listByUser("local");
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const records = user ? await supabaseStore.listByUser(user.id) : [];
   const now = Date.now();
 
   const decks = records.map((r) => ({
