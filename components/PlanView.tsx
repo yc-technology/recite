@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { PresentationRecord } from "@/lib/store/types";
 import { Button, Card, Label } from "@/components/nothing";
+import { PresentationActions } from "@/components/PresentationActions";
 
 const difficultyColor: Record<string, string> = {
   easy: "text-success",
@@ -25,6 +26,7 @@ export function PlanView({
         <h1 className="font-grotesk font-light text-display text-[clamp(1.8rem,5vw,2.75rem)] leading-[1.05] tracking-[-0.02em]">
           {record.title}
         </h1>
+        <PresentationActions id={record.id} title={record.title} />
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="flex items-end gap-3">
             <span className="font-mono text-display text-[clamp(3rem,12vw,6rem)] leading-[0.9] tracking-[-0.03em]">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Card, Label } from "@/components/nothing";
+import { DeckCard } from "@/components/DeckCard";
 import { supabaseStore } from "@/lib/store/supabase";
 import { createClient } from "@/lib/supabase/server";
 
@@ -64,24 +65,13 @@ export default async function Dashboard() {
           ) : (
             <div className="space-y-2">
               {decks.map((d) => (
-                <Link key={d.id} href={`/presentation/${d.id}`} className="block">
-                  <Card className="flex items-center justify-between hover:border-border-strong">
-                    <div className="min-w-0">
-                      <h3 className="font-grotesk font-medium text-primary text-[17px] truncate">
-                        {d.title}
-                      </h3>
-                      <Label>{d.total} segments</Label>
-                    </div>
-                    <div className="flex items-baseline gap-2 shrink-0 pl-4">
-                      <span
-                        className={`font-mono text-[28px] leading-none ${d.due > 0 ? "text-accent" : "text-disabled"}`}
-                      >
-                        {d.due}
-                      </span>
-                      <Label>due</Label>
-                    </div>
-                  </Card>
-                </Link>
+                <DeckCard
+                  key={d.id}
+                  id={d.id}
+                  title={d.title}
+                  total={d.total}
+                  due={d.due}
+                />
               ))}
             </div>
           )}

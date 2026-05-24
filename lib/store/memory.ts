@@ -20,4 +20,12 @@ export const memoryStore: Store = {
     const r = db.get(id);
     if (r && r.userId === userId) r.practice = practice;
   },
+  async rename(id, userId, title) {
+    const r = db.get(id);
+    if (r && r.userId === userId) r.title = title;
+  },
+  async remove(id, userId) {
+    const r = db.get(id);
+    if (r && r.userId === userId) db.delete(id);
+  },
 };

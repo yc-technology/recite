@@ -132,4 +132,21 @@ export const supabaseStore: Store = {
       if (error) throw error;
     }
   },
+
+  async rename(id, userId, title) {
+    const supabase = await createClient();
+    void userId; // RLS scopes the update to the owner
+    const { error } = await supabase
+      .from("presentations")
+      .update({ title })
+      .eq("id", id);
+    if (error) throw error;
+  },
+
+  async remove(id, userId) {
+    const supabase = await createClient();
+    void userId; // RLS scopes the delete; FK cascade removes segments/practice
+    const { error } = await supabase.from("presentations").delete().eq("id", id);
+    if (error) throw error;
+  },
 };
