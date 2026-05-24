@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Label } from "@/components/nothing";
-import { SentencePlayer } from "@/components/SentencePlayer";
+import { SpeakableMarkdown } from "@/components/SpeakableMarkdown";
 
 export type SectionView = {
   index: number;
@@ -106,8 +106,8 @@ export function SectionBoard({
                 )}
 
                 <div className="pl-10 space-y-2">
-                  <Label className="!text-success">Optimized · tap a line to hear it</Label>
-                  <SentencePlayer text={sec.optimized} />
+                  <Label className="!text-success">Optimized · double-click a paragraph to hear it</Label>
+                  <SpeakableMarkdown>{sec.optimized}</SpeakableMarkdown>
                 </div>
 
                 <details className="pl-10">

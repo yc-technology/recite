@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NotifyProvider } from "@/components/Notify";
+import { TtsProvider } from "@/components/TtsProvider";
 
 export const metadata: Metadata = {
   title: "RECITE — English Presentation Trainer",
@@ -31,7 +32,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-bg text-primary">
-        <NotifyProvider>{children}</NotifyProvider>
+        <NotifyProvider>
+          <TtsProvider>{children}</TtsProvider>
+        </NotifyProvider>
       </body>
     </html>
   );

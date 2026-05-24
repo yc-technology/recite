@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Grade } from "@/lib/srs/sm2";
-import { stopSpeak } from "@/lib/tts";
 import { Button, Label } from "@/components/nothing";
-import { SentencePlayer } from "@/components/SentencePlayer";
+import { SpeakableMarkdown } from "@/components/SpeakableMarkdown";
 import { SectionChat } from "@/components/SectionChat";
 import { useNotify } from "@/components/Notify";
+import { useTts } from "@/components/TtsProvider";
 
 export type DueSection = {
   index: number;
@@ -42,6 +42,7 @@ export function PracticeSession({
   sections: DueSection[];
 }) {
   const notify = useNotify();
+  const { stop: ttsStop } = useTts();
   const total = sections.length;
   const [queue, setQueue] = useState<number[]>(() =>
     sections.map((_, i) => i),
@@ -59,16 +60,16 @@ export function PracticeSession({
   useEffect(() => {
     setChecked(current ? current.keyPoints.map(() => false) : []);
     setRevealed(false);
-    stopSpeak();
+    ttsStop();
   }, [curPos]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => () => stopSpeak(), []);
+  useEffect(() => () => ttsStop(), [ttsStop]);
 
   const grade = useCallback(
     async (g: Grade) => {
       if (!current || saving) return;
       setSaving(true);
-      stopSpeak();
+      ttsStop();
       try {
         const res = await fetch("/api/practice-review", {
           method: "POST",
@@ -91,7 +92,7 @@ export function PracticeSession({
       });
       if (g !== Grade.Again) setFinished((f) => f + 1);
     },
-    [current, id, saving, notify],
+    [current, id, saving, notify, ttsStop],
   );
 
   // Keyboard: Space = reveal, 1-4 = grade. Ignore while typing in chat.
@@ -207,8 +208,8 @@ export function PracticeSession({
               </ul>
             </div>
             <div className="space-y-2">
-              <Label className="!text-success">Optimized · tap a line to hear it</Label>
-              <SentencePlayer text={current.optimized} />
+              <Label className="!text-success">Optimized · double-click a paragraph to hear it</Label>
+              <SpeakableMarkdown>{current.optimized}</SpeakableMarkdown>
             </div>
             <div className="space-y-1">
               <Label>Your original</Label>
