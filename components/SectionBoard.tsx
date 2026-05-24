@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, Label } from "@/components/nothing";
+import { Card, Label } from "@/components/nothing";
 import { SentencePlayer } from "@/components/SentencePlayer";
 
 export type SectionView = {
@@ -41,7 +41,6 @@ export function SectionBoard({
   sections: SectionView[];
 }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<Set<number>>(new Set());
   const [navOpen, setNavOpen] = useState(false);
 
   function jumpTo(i: number) {
@@ -51,52 +50,23 @@ export function SectionBoard({
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function toggle(i: number) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
-      return next;
-    });
-  }
-  const allSelected = selected.size === sections.length && sections.length > 0;
-  function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(sections.map((s) => s.index)));
-  }
-  function practiceSelected() {
-    const idxs = [...selected].sort((a, b) => a - b);
-    router.push(`/practice/${id}?sections=${idxs.join(",")}`);
-  }
-
   const mastered = sections.filter((s) => s.level >= 3).length;
   const dueCount = sections.filter((s) => s.due).length;
 
   return (
     <>
       <section className="space-y-5">
-        <div className="flex items-center justify-between">
-          <Label>Sections — {sections.length}</Label>
-          <button onClick={toggleAll} className="label hover:text-primary">
-            {allSelected ? "CLEAR" : "SELECT ALL"}
-          </button>
-        </div>
+        <Label>Sections — {sections.length}</Label>
 
         <ol className="space-y-3">
           {sections.map((sec) => {
-            const isSel = selected.has(sec.index);
             return (
               <Card
                 key={sec.index}
                 id={`sec-${sec.index}`}
-                className={`space-y-3 scroll-mt-6 ${isSel ? "border-primary" : ""}`}
+                className="space-y-3 scroll-mt-6"
               >
                 <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => toggle(sec.index)}
-                    className={`shrink-0 text-[16px] ${isSel ? "text-accent" : "text-disabled hover:text-primary"}`}
-                    aria-label="Select section"
-                  >
-                    {isSel ? "☑" : "☐"}
-                  </button>
                   <span className="font-mono text-secondary text-[13px] w-7 shrink-0">
                     {String(sec.index + 1).padStart(2, "0")}
                   </span>
@@ -190,15 +160,6 @@ export function SectionBoard({
           />
         </div>
       </section>
-
-      {/* Selection action bar */}
-      {selected.size > 0 && (
-        <div className="sticky bottom-4 flex justify-center">
-          <Button variant="primary" className="px-8 py-4" onClick={practiceSelected}>
-            Practice {selected.size} selected →
-          </Button>
-        </div>
-      )}
 
       {/* Floating section navigator — jump to any section from anywhere */}
       {navOpen && (
