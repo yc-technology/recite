@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { LogOut, Plus, Settings } from "lucide-react";
+import { LogOut, PenLine, Plus, Settings } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Label, ThemeToggle } from "@/components/nothing";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -26,6 +26,10 @@ export function AccountMenu() {
 
   return (
     <div className="flex items-center gap-6">
+      <Link href="/write" className="label hover:text-primary flex items-center gap-1.5">
+        <PenLine size={13} />
+        WRITE
+      </Link>
       <Link href="/upload" className="label hover:text-primary flex items-center gap-1.5">
         <Plus size={13} />
         NEW

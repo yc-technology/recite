@@ -46,6 +46,21 @@ export const OptimizeStyleSchema = z.enum([
 ]);
 export type OptimizeStyle = z.infer<typeof OptimizeStyleSchema>;
 
+// ── Writing coach ─────────────────────────────────────────────────────
+export const WriteIssueSchema = z.object({
+  excerpt: z.string(), // the problematic phrase from the learner's text
+  type: z.string(), // e.g. grammar / word choice / collocation / tense / article
+  explanation: z.string(), // why it's wrong or awkward (one line)
+  fix: z.string(), // the corrected phrasing
+});
+export const WriteReviewSchema = z.object({
+  corrected: z.string(), // full improved rewrite, standard markdown
+  issues: z.array(WriteIssueSchema),
+  comment: z.string(), // 1-2 sentence overall feedback
+});
+export type WriteIssue = z.infer<typeof WriteIssueSchema>;
+export type WriteReview = z.infer<typeof WriteReviewSchema>;
+
 export type Normalized = z.infer<typeof NormalizedSchema>;
 export type NormalizedSection = z.infer<typeof NormalizedSectionSchema>;
 export type Enrichment = z.infer<typeof EnrichmentSchema>;
