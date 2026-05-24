@@ -12,16 +12,36 @@ type Ctx = {
 
 const CHIPS = ["Quiz me on this", "Say it in simpler words", "Pronunciation tips?"];
 
-export function SectionChat({ section }: { section: Ctx }) {
+export function SectionChat({
+  presentationId,
+  sectionIndex,
+  section,
+}: {
+  presentationId: string;
+  sectionIndex: number;
+  section: Ctx;
+}) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Reset the conversation when the practiced section changes.
+  // Load this section's saved conversation when the section changes.
   useEffect(() => {
+    let active = true;
     setMessages([]);
-  }, [section.title]);
+    fetch(
+      `/api/chat?presentationId=${presentationId}&sectionIndex=${sectionIndex}`,
+    )
+      .then((r) => (r.ok ? r.json() : { messages: [] }))
+      .then((d) => {
+        if (active) setMessages(d.messages ?? []);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [presentationId, sectionIndex]);
 
   async function send(text: string) {
     const q = text.trim();
@@ -34,7 +54,7 @@ export function SectionChat({ section }: { section: Ctx }) {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ section, messages: next }),
+        body: JSON.stringify({ presentationId, sectionIndex, section, messages: next }),
       });
       const { reply } = await res.json();
       setMessages((m) => [

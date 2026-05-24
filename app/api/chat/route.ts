@@ -1,11 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { coachReply } from "@/lib/agent/chat";
+import { listChat, appendChat } from "@/lib/store/chat";
 import { createClient } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+async function authed() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+}
+
+// Load the saved conversation for a section.
+export async function GET(req: NextRequest) {
+  const user = await authed();
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  const presentationId = searchParams.get("presentationId");
+  const sectionIndex = Number(searchParams.get("sectionIndex"));
+  if (!presentationId || !Number.isInteger(sectionIndex)) {
+    return NextResponse.json({ error: "invalid input" }, { status: 400 });
+  }
+  const messages = await listChat(presentationId, sectionIndex);
+  return NextResponse.json({ messages });
+}
+
 const Body = z.object({
+  presentationId: z.string().min(1),
+  sectionIndex: z.number().int().nonnegative(),
   section: z.object({
     title: z.string(),
     optimized: z.string(),
@@ -20,20 +46,27 @@ const Body = z.object({
       }),
     )
     .min(1)
-    .max(20),
+    .max(40),
 });
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await authed();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const parsed = Body.safeParse(await req.json());
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid input" }, { status: 400 });
   }
-  const reply = await coachReply(parsed.data.section, parsed.data.messages);
+  const { presentationId, sectionIndex, section, messages } = parsed.data;
+
+  const reply = await coachReply(section, messages);
+
+  // Persist only the new turn (the last user message + this reply).
+  const lastUser = messages[messages.length - 1];
+  await appendChat(presentationId, user.id, sectionIndex, [
+    lastUser,
+    { role: "assistant", content: reply },
+  ]);
+
   return NextResponse.json({ reply });
 }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Grade } from "@/lib/srs/sm2";
+import { speak, stopSpeak } from "@/lib/tts";
 import { Button, Label } from "@/components/nothing";
 import { Markdown } from "@/components/Markdown";
 import { SectionChat } from "@/components/SectionChat";
@@ -31,26 +32,6 @@ const levelHint: Record<number, string> = {
   2: "Recall the key points and explain it — only the gist is shown.",
   3: "From the title alone, recall and explain the whole section.",
 };
-
-function stripMd(s: string): string {
-  return s
-    .replace(/[#*_`>~]/g, " ")
-    .replace(/^\s*[-•]\s*/gm, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-function speak(text: string) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(stripMd(text));
-  u.lang = "en-US";
-  u.rate = 0.95;
-  window.speechSynthesis.speak(u);
-}
-function stopSpeak() {
-  if (typeof window !== "undefined" && "speechSynthesis" in window)
-    window.speechSynthesis.cancel();
-}
 
 export function PracticeSession({
   id,
@@ -266,6 +247,8 @@ export function PracticeSession({
       )}
 
       <SectionChat
+        presentationId={id}
+        sectionIndex={current.index}
         section={{
           title: current.title,
           optimized: current.optimized,
