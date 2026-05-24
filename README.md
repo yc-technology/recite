@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RECITE
 
-## Getting Started
+An English-presentation rehearsal app. Upload your talk, an OpenAI agent breaks it
+into recitation segments + a day-by-day study plan, then you drill each segment with
+cloze (masked) recall on an SM-2 spaced-repetition schedule. UI is built in the
+Nothing design language (monochrome, dot-matrix, one red accent), with light/dark modes.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) + TypeScript + Tailwind CSS v4
+- **OpenAI Agents SDK** (`@openai/agents`) for presentation analysis (structured output via zod)
+- **Supabase** — Auth + Postgres (RLS) for persistence
+- **Vitest** for the pure-logic core (scheduler, cloze, parsing, schema)
+- File parsing: `unpdf` (PDF), `jszip` (PPTX), native decode (md/txt)
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then fill in the values below
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `OPENAI_API_KEY` | yes | Your OpenAI key. |
+| `OPENAI_BASE_URL` | no | Override the OpenAI endpoint (proxy / OpenAI-compatible gateway). Leave blank for the official API. |
+| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Supabase anon/public key. |
+| `SUPABASE_SERVICE_ROLE_KEY` | no | Reserved for server-only admin tasks. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env.local` is gitignored. Never commit real keys.
 
-## Learn More
+### Database
 
-To learn more about Next.js, take a look at the following resources:
+Apply the migration to your Supabase project (creates the tables + row-level security
+so each user only sees their own data):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Supabase CLI
+supabase db push
+# — or — paste supabase/migrations/0001_init.sql into the Supabase SQL editor.
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Email auth is used out of the box. If you disable "Confirm email" in the Supabase
+Auth settings, sign-up logs you in immediately; otherwise confirm via the emailed link
+before signing in.
 
-## Deploy on Vercel
+## Develop
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev      # http://localhost:3000
+npm test         # run the unit suite (Vitest)
+npm run build    # production build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Flow
+
+1. `/login` — sign up / sign in (Supabase).
+2. `/upload` — pick a PDF/PPTX/MD/TXT; the text is extracted, then the agent builds a plan.
+3. `/presentation/[id]` — review segments, difficulty, hints, and the daily schedule.
+4. `/practice/[id]` — recall each segment from masked blanks, reveal, then self-grade
+   (Again / Hard / Good / Easy). Grades feed the SM-2 schedule.
+5. `/` — dashboard shows total cards due and an "Enter focus" shortcut to the busiest deck.
+
+## Architecture notes
+
+- `lib/srs/` — SM-2 lite scheduler (pure, unit-tested).
+- `lib/cloze.ts` — sentence masking (pure, unit-tested).
+- `lib/parse/` — file → text, dispatched by extension.
+- `lib/agent/` — agent definition, zod `StudyPlanSchema`, and the OpenAI client
+  (honors `OPENAI_BASE_URL`).
+- `lib/store/` — a single `Store` interface with two implementations: `memory.ts`
+  (kept for reference/local experiments) and `supabase.ts` (the live one). The store is
+  the snake_case ↔ camelCase mapping boundary.
+- `lib/supabase/` — browser + server (async-cookies) clients; `proxy.ts` at the root
+  refreshes the session and gates unauthenticated users to `/login`.
+- `components/nothing/` — Nothing design primitives (Button, Card, Label, ThemeToggle).
+
+## Deploy (Vercel)
+
+1. Import the repo into Vercel.
+2. Set the environment variables from the table above in Project Settings.
+3. Deploy. `vercel.json` gives `app/api/analyze` a 60s `maxDuration` for the agent call.
+
+The OpenAI Agents SDK and all file parsing run on the Node.js runtime inside route
+handlers (`export const runtime = "nodejs"`).
