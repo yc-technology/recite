@@ -5,14 +5,15 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Label } from "@/components/nothing";
+import { useNotify } from "@/components/Notify";
 
 const REMEMBER_KEY = "recite:email";
 
 export default function LoginPage() {
   const router = useRouter();
+  const notify = useNotify();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [remember, setRemember] = useState(true);
 
@@ -34,7 +35,7 @@ export default function LoginPage() {
     const email = emailRef.current?.value.trim() ?? "";
     const password = passwordRef.current?.value ?? "";
     if (!email || !password) {
-      setStatus("[ERROR: enter email and password]");
+      notify("[ERROR: enter email and password]");
       return;
     }
     try {
@@ -42,23 +43,27 @@ export default function LoginPage() {
       else localStorage.removeItem(REMEMBER_KEY);
     } catch {}
     setBusy(true);
-    setStatus(null);
-    const supabase = createClient();
-    const { error } =
-      kind === "in"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
-    setBusy(false);
-    if (error) {
-      setStatus(`[ERROR: ${error.message}]`);
-      return;
+    try {
+      const supabase = createClient();
+      const { error } =
+        kind === "in"
+          ? await supabase.auth.signInWithPassword({ email, password })
+          : await supabase.auth.signUp({ email, password });
+      if (error) {
+        notify(`[ERROR: ${error.message}]`);
+        return;
+      }
+      if (kind === "up") {
+        notify("[ CHECK EMAIL TO CONFIRM ]", "info");
+        return;
+      }
+      router.push("/");
+      router.refresh();
+    } catch (e) {
+      notify(`[ERROR: ${e instanceof Error ? e.message : "login failed"}]`);
+    } finally {
+      setBusy(false);
     }
-    if (kind === "up") {
-      setStatus("[ CHECK EMAIL TO CONFIRM ]");
-      return;
-    }
-    router.push("/");
-    router.refresh();
   }
 
   return (
@@ -121,9 +126,6 @@ export default function LoginPage() {
               Sign up
             </Button>
           </div>
-          {status && (
-            <p className="font-mono text-[12px] text-accent">{status}</p>
-          )}
         </div>
       </main>
     </>

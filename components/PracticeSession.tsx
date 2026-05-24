@@ -7,6 +7,7 @@ import { speak, stopSpeak } from "@/lib/tts";
 import { Button, Label } from "@/components/nothing";
 import { Markdown } from "@/components/Markdown";
 import { SectionChat } from "@/components/SectionChat";
+import { useNotify } from "@/components/Notify";
 
 export type DueSection = {
   index: number;
@@ -40,6 +41,7 @@ export function PracticeSession({
   id: string;
   sections: DueSection[];
 }) {
+  const notify = useNotify();
   const total = sections.length;
   const [queue, setQueue] = useState<number[]>(() =>
     sections.map((_, i) => i),
@@ -68,23 +70,28 @@ export function PracticeSession({
       setSaving(true);
       stopSpeak();
       try {
-        await fetch("/api/practice-review", {
+        const res = await fetch("/api/practice-review", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ id, segmentIndex: current.index, grade: g }),
         });
+        if (!res.ok) throw new Error(`save failed (${res.status})`);
+      } catch (e) {
+        // Don't advance on failure — the grade wasn't saved.
+        notify(`[ERROR: ${e instanceof Error ? e.message : "save failed"}]`);
+        return;
       } finally {
         setSaving(false);
-        setCounts((c) => ({ ...c, [GRADE_KEY[g]]: c[GRADE_KEY[g]] + 1 }));
-        setQueue((q) => {
-          const [head, ...rest] = q;
-          // Again: requeue this card to the end of the session; else finish it.
-          return g === Grade.Again ? [...rest, head] : rest;
-        });
-        if (g !== Grade.Again) setFinished((f) => f + 1);
       }
+      setCounts((c) => ({ ...c, [GRADE_KEY[g]]: c[GRADE_KEY[g]] + 1 }));
+      setQueue((q) => {
+        const [head, ...rest] = q;
+        // Again: requeue this card to the end of the session; else finish it.
+        return g === Grade.Again ? [...rest, head] : rest;
+      });
+      if (g !== Grade.Again) setFinished((f) => f + 1);
     },
-    [current, id, saving],
+    [current, id, saving, notify],
   );
 
   // Keyboard: Space = reveal, 1-4 = grade. Ignore while typing in chat.

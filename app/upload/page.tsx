@@ -4,22 +4,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { Button, Label } from "@/components/nothing";
+import { useNotify } from "@/components/Notify";
 
 type Section = { title: string; text: string };
 type Busy = "idle" | "parsing" | "normalizing" | "analyzing";
 
 export default function UploadPage() {
   const router = useRouter();
+  const notify = useNotify();
   const [busy, setBusy] = useState<Busy>("idle");
   const [title, setTitle] = useState("");
   const [sourceType, setSourceType] = useState("text");
   const [sections, setSections] = useState<Section[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setError(null);
     setSections(null);
     try {
       // 1) extract raw text
@@ -43,7 +43,7 @@ export default function UploadPage() {
       const { sections } = await nRes.json();
       setSections(sections);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "failed");
+      notify(`[ERROR: ${err instanceof Error ? err.message : "failed"}]`);
     } finally {
       setBusy("idle");
     }
@@ -60,7 +60,6 @@ export default function UploadPage() {
 
   async function analyze() {
     if (!sections?.length) return;
-    setError(null);
     setBusy("analyzing");
     try {
       const res = await fetch("/api/analyze", {
@@ -72,7 +71,7 @@ export default function UploadPage() {
       const { id } = await res.json();
       router.push(`/presentation/${id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "analysis failed");
+      notify(`[ERROR: ${err instanceof Error ? err.message : "analysis failed"}]`);
       setBusy("idle");
     }
   }
@@ -165,10 +164,6 @@ export default function UploadPage() {
                 : "Generate study plan →"}
             </Button>
           </div>
-        )}
-
-        {error && (
-          <p className="font-mono text-[12px] text-accent">[ERROR: {error}]</p>
         )}
       </main>
     </>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useNotify } from "@/components/Notify";
 
 export function LogoutButton({
   className = "",
@@ -12,15 +13,18 @@ export function LogoutButton({
   children?: React.ReactNode;
 }) {
   const router = useRouter();
+  const notify = useNotify();
   const [busy, setBusy] = useState(false);
 
   async function logout() {
     setBusy(true);
     try {
-      await createClient().auth.signOut();
+      const { error } = await createClient().auth.signOut();
+      if (error) throw error;
       router.push("/login");
       router.refresh();
-    } finally {
+    } catch (e) {
+      notify(`[ERROR: ${e instanceof Error ? e.message : "logout failed"}]`);
       setBusy(false);
     }
   }

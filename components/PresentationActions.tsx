@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Label } from "@/components/nothing";
+import { useNotify } from "@/components/Notify";
 
 export function PresentationActions({
   id,
@@ -12,6 +13,7 @@ export function PresentationActions({
   title: string;
 }) {
   const router = useRouter();
+  const notify = useNotify();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(title);
   const [confirming, setConfirming] = useState(false);
@@ -21,13 +23,16 @@ export function PresentationActions({
     if (!value.trim()) return;
     setBusy(true);
     try {
-      await fetch(`/api/presentation/${id}`, {
+      const res = await fetch(`/api/presentation/${id}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ title: value.trim() }),
       });
+      if (!res.ok) throw new Error(`rename failed (${res.status})`);
       setEditing(false);
       router.refresh();
+    } catch (e) {
+      notify(`[ERROR: ${e instanceof Error ? e.message : "rename failed"}]`);
     } finally {
       setBusy(false);
     }
@@ -36,9 +41,11 @@ export function PresentationActions({
   async function del() {
     setBusy(true);
     try {
-      await fetch(`/api/presentation/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/presentation/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(`delete failed (${res.status})`);
       router.push("/");
-    } finally {
+    } catch (e) {
+      notify(`[ERROR: ${e instanceof Error ? e.message : "delete failed"}]`);
       setBusy(false);
     }
   }

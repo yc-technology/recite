@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { NotifyProvider } from "@/components/Notify";
 
 export const metadata: Metadata = {
   title: "RECITE — English Presentation Trainer",
@@ -30,7 +31,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-bg text-primary">
-        {children}
+        <NotifyProvider>{children}</NotifyProvider>
       </body>
     </html>
   );

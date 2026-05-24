@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useNotify } from "@/components/Notify";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Ctx = {
@@ -21,6 +22,7 @@ export function SectionChat({
   sectionIndex: number;
   section: Ctx;
 }) {
+  const notify = useNotify();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -56,16 +58,11 @@ export function SectionChat({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ presentationId, sectionIndex, section, messages: next }),
       });
+      if (!res.ok) throw new Error(`chat failed (${res.status})`);
       const { reply } = await res.json();
-      setMessages((m) => [
-        ...m,
-        { role: "assistant", content: reply || "…" },
-      ]);
-    } catch {
-      setMessages((m) => [
-        ...m,
-        { role: "assistant", content: "[error: try again]" },
-      ]);
+      setMessages((m) => [...m, { role: "assistant", content: reply || "…" }]);
+    } catch (e) {
+      notify(`[ERROR: ${e instanceof Error ? e.message : "chat failed"}]`);
     } finally {
       setBusy(false);
     }

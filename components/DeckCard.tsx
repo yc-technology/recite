@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Label } from "@/components/nothing";
+import { useNotify } from "@/components/Notify";
 
 export function DeckCard({
   id,
@@ -16,14 +17,18 @@ export function DeckCard({
   due: number;
 }) {
   const router = useRouter();
+  const notify = useNotify();
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
 
   async function del() {
     setBusy(true);
     try {
-      await fetch(`/api/presentation/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/presentation/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(`delete failed (${res.status})`);
       router.refresh();
+    } catch (e) {
+      notify(`[ERROR: ${e instanceof Error ? e.message : "delete failed"}]`);
     } finally {
       setBusy(false);
     }
