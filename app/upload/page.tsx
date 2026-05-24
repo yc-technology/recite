@@ -9,6 +9,14 @@ import { useNotify } from "@/components/Notify";
 
 type Section = { title: string; text: string };
 type Busy = "idle" | "parsing" | "normalizing" | "analyzing";
+type Style = "simple" | "native" | "formal" | "concise";
+
+const STYLES: { value: Style; label: string; hint: string }[] = [
+  { value: "simple", label: "Simple", hint: "Easy words, easy to memorize" },
+  { value: "native", label: "Native", hint: "Natural, idiomatic flow" },
+  { value: "formal", label: "Formal", hint: "Polished business register" },
+  { value: "concise", label: "Concise", hint: "Tight and punchy" },
+];
 
 export default function UploadPage() {
   const router = useRouter();
@@ -17,6 +25,7 @@ export default function UploadPage() {
   const [title, setTitle] = useState("");
   const [sourceType, setSourceType] = useState("text");
   const [sections, setSections] = useState<Section[] | null>(null);
+  const [style, setStyle] = useState<Style>("simple");
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -66,7 +75,7 @@ export default function UploadPage() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ title, sourceType, sections }),
+        body: JSON.stringify({ title, sourceType, style, sections }),
       });
       if (!res.ok) throw new Error(`analysis failed (${res.status})`);
       const { id } = await res.json();
@@ -152,6 +161,35 @@ export default function UploadPage() {
                   />
                 </div>
               ))}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Optimized style</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {STYLES.map((s) => {
+                  const active = style === s.value;
+                  return (
+                    <button
+                      key={s.value}
+                      onClick={() => setStyle(s.value)}
+                      className={`text-left border rounded-[6px] px-3 py-2.5 ${
+                        active
+                          ? "border-accent bg-accent/10"
+                          : "border-border hover:border-border-strong"
+                      }`}
+                    >
+                      <div
+                        className={`font-grotesk font-medium text-[15px] ${active ? "text-primary" : "text-secondary"}`}
+                      >
+                        {s.label}
+                      </div>
+                      <div className="text-secondary text-[12px] leading-snug mt-0.5">
+                        {s.hint}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <Button

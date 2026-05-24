@@ -37,6 +37,15 @@ export const StudyPlanSchema = z.object({
   sections: z.array(SectionSchema),
 });
 
+// Preferred style for the "optimized" rewrite, chosen at analysis time.
+export const OptimizeStyleSchema = z.enum([
+  "simple",
+  "native",
+  "formal",
+  "concise",
+]);
+export type OptimizeStyle = z.infer<typeof OptimizeStyleSchema>;
+
 export type Normalized = z.infer<typeof NormalizedSchema>;
 export type NormalizedSection = z.infer<typeof NormalizedSectionSchema>;
 export type Enrichment = z.infer<typeof EnrichmentSchema>;

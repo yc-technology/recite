@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { analyzeSections } from "@/lib/agent/analyze";
+import { OptimizeStyleSchema } from "@/lib/agent/schema";
 import { initialCard } from "@/lib/srs/sm2";
 import { supabaseStore } from "@/lib/store/supabase";
 import { createClient } from "@/lib/supabase/server";
@@ -11,6 +12,7 @@ export const maxDuration = 60;
 const Body = z.object({
   title: z.string().min(1),
   sourceType: z.string().min(1),
+  style: OptimizeStyleSchema.default("simple"),
   sections: z
     .array(z.object({ title: z.string(), text: z.string().min(1) }))
     .min(1),
@@ -27,10 +29,10 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid input" }, { status: 400 });
   }
-  const { title, sourceType, sections } = parsed.data;
+  const { title, sourceType, style, sections } = parsed.data;
 
   try {
-    const plan = await analyzeSections(sections);
+    const plan = await analyzeSections(sections, style);
     const now = new Date();
     const practice: PracticeState[] = plan.sections.map((_, i) => ({
       ...initialCard(now),

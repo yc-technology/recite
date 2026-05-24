@@ -5,8 +5,21 @@ import {
   type StudyPlan,
   type NormalizedSection,
   type Enrichment,
+  type OptimizeStyle,
 } from "./schema";
 import { configureSdk, modelOption } from "./runtime";
+
+// Per-style guidance for the "optimized" rewrite. Chosen by the user at analysis time.
+const STYLE_GUIDE: Record<OptimizeStyle, string> = {
+  simple:
+    'Use SIMPLE, COMMON, everyday words (prefer "use" over "leverage", "show" over "demonstrate"). Short sentences that are easy to say aloud and easy to memorize.',
+  native:
+    "Use natural, idiomatic, native-sounding English — smooth flow and common collocations a fluent speaker would use. Vocabulary can be richer where it reads naturally.",
+  formal:
+    "Use a polished, professional business register: precise, confident wording suitable for a formal presentation, without being stiff or wordy.",
+  concise:
+    "Make it tight and punchy: cut filler words, prefer short high-impact sentences, while keeping every key point intact.",
+};
 
 // Merge by index — title/text come from the (clean) input, never the model, so
 // the reference text stays exact even if the model drifts, returns fewer items,
@@ -34,7 +47,8 @@ export function mergeEnrichments(
   return StudyPlanSchema.parse({ sections: merged });
 }
 
-const INSTRUCTIONS = `You are an English presentation coach. You receive a JSON array of
+function buildInstructions(style: OptimizeStyle): string {
+  return `You are an English presentation coach. You receive a JSON array of
 presentation sections, each with an index, a title, and text. For EACH section, in the
 SAME ORDER, produce:
 - "summary": one sentence on what the section is about.
@@ -42,9 +56,7 @@ SAME ORDER, produce:
 - "difficulty": "easy" | "medium" | "hard" for reciting it from understanding.
 - "optimized": a clearer, presentation-ready rewrite of the section, formatted as clean
   STANDARD MARKDOWN. Rules for "optimized":
-  * Use SIMPLE, COMMON, everyday English words. Avoid advanced, fancy, or rare vocabulary
-    (e.g. prefer "use" over "leverage", "show" over "demonstrate", "start" over "commence").
-  * Short sentences that are easy to say aloud and easy to memorize.
+  * ${STYLE_GUIDE[style]}
   * Clear structure: short paragraphs separated by blank lines; use "- " bullet lists for
     enumerations; use **bold** for only a few key terms. Do NOT use headings (#).
   * Preserve the speaker's meaning and intent. Do NOT add new facts.
@@ -52,14 +64,16 @@ SAME ORDER, produce:
 Respond with ONLY a single JSON object of exactly this shape:
 { "enrichments": [ { "summary": string, "keyPoints": string[], "difficulty": "easy" | "medium" | "hard", "optimized": string } ] }
 Return EXACTLY one enrichment per input section, in the same order.`;
+}
 
 export async function analyzeSections(
   sections: NormalizedSection[],
+  style: OptimizeStyle = "simple",
 ): Promise<StudyPlan> {
   configureSdk();
   const agent = new Agent({
     name: "Presentation Analyzer",
-    instructions: INSTRUCTIONS,
+    instructions: buildInstructions(style),
     outputType: EnrichmentsSchema,
     ...modelOption(),
   });
