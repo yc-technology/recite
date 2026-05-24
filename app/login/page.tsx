@@ -16,6 +16,7 @@ export default function LoginPage() {
   const passwordRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   // Prefill the remembered email on load (password is left to the browser's
   // password manager via autoComplete).
@@ -34,10 +35,17 @@ export default function LoginPage() {
     // onChange) is always picked up.
     const email = emailRef.current?.value.trim() ?? "";
     const password = passwordRef.current?.value ?? "";
-    if (!email || !password) {
-      notify("[ERROR: enter email and password]");
-      return;
-    }
+
+    // Field-level validation, shown inline next to each input.
+    const errs: { email?: string; password?: string } = {};
+    if (!email) errs.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      errs.email = "Enter a valid email address";
+    if (!password) errs.password = "Password is required";
+    else if (kind === "up" && password.length < 6)
+      errs.password = "At least 6 characters";
+    setErrors(errs);
+    if (errs.email || errs.password) return;
     try {
       if (remember) localStorage.setItem(REMEMBER_KEY, email);
       else localStorage.removeItem(REMEMBER_KEY);
@@ -84,8 +92,14 @@ export default function LoginPage() {
               type="email"
               name="email"
               autoComplete="email"
-              className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none"
+              onChange={() => setErrors((e) => ({ ...e, email: undefined }))}
+              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none ${
+                errors.email ? "border-accent" : "border-border"
+              }`}
             />
+            {errors.email && (
+              <p className="font-mono text-[11px] text-accent">{errors.email}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Password</Label>
@@ -94,9 +108,17 @@ export default function LoginPage() {
               type="password"
               name="password"
               autoComplete="current-password"
+              onChange={() => setErrors((e) => ({ ...e, password: undefined }))}
               onKeyDown={(e) => e.key === "Enter" && run("in")}
-              className="w-full bg-surface border border-border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none"
+              className={`w-full bg-surface border rounded-[4px] px-4 py-3 text-primary font-mono text-[14px] focus:border-primary outline-none ${
+                errors.password ? "border-accent" : "border-border"
+              }`}
             />
+            {errors.password && (
+              <p className="font-mono text-[11px] text-accent">
+                {errors.password}
+              </p>
+            )}
           </div>
           <button
             type="button"
