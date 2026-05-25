@@ -90,15 +90,16 @@ export function Teleprompter({
           aria-label="Close teleprompter"
           className="label hover:text-primary flex items-center gap-1.5"
         >
-          <X size={16} />
+          <X size={16} aria-hidden />
           CLOSE
         </Link>
         <span className="label truncate">{title}</span>
         <button
           onClick={toggleFullscreen}
+          aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           className="label hover:text-primary flex items-center gap-1.5"
         >
-          {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+          {isFullscreen ? <Minimize size={16} aria-hidden /> : <Maximize size={16} aria-hidden />}
           {isFullscreen ? "EXIT FULLSCREEN" : "FULLSCREEN"}
         </button>
       </div>
@@ -115,6 +116,7 @@ export function Teleprompter({
                 <button
                   key={s.idx}
                   data-idx={s.idx}
+                  aria-pressed={active === s.idx}
                   onClick={() => setActive(s.idx)}
                   className={
                     "block w-full text-left transition-all duration-200 pl-4 border-l-2 " +
