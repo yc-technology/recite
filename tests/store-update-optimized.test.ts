@@ -33,4 +33,13 @@ describe("updateOptimized", () => {
     const got = await memoryStore.get(rec.id, "u1");
     expect(got?.plan.sections[0].optimized).toBe("old A");
   });
+
+  it("is a no-op for an out-of-bounds section index", async () => {
+    const rec = await memoryStore.create(seed());
+    await memoryStore.updateOptimized(rec.id, "u1", 99, "nope");
+    const got = await memoryStore.get(rec.id, "u1");
+    expect(got?.plan.sections).toHaveLength(2);
+    expect(got?.plan.sections[0].optimized).toBe("old A");
+    expect(got?.plan.sections[1].optimized).toBe("old B");
+  });
 });

@@ -138,12 +138,13 @@ export const supabaseStore: Store = {
   async updateOptimized(id, userId, sectionIndex, optimized) {
     const supabase = await createClient();
     void userId; // RLS scopes the update to the owner
-    const { error } = await supabase
+    const { error, count } = await supabase
       .from("segments")
-      .update({ optimized })
+      .update({ optimized }, { count: "exact" })
       .eq("presentation_id", id)
       .eq("order_index", sectionIndex);
     if (error) throw error;
+    if (count === 0) throw new Error(`segment ${sectionIndex} not found`);
   },
 
   async rename(id, userId, title) {
