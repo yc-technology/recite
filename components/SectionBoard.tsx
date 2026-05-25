@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, List, Play, X } from "lucide-react";
 import { Card, Label } from "@/components/nothing";
-import { SpeakableMarkdown } from "@/components/SpeakableMarkdown";
+import { SectionRefine } from "@/components/SectionRefine";
 
 export type SectionView = {
   index: number;
@@ -130,10 +130,11 @@ export function SectionBoard({
                   </ul>
                 )}
 
-                <div className="space-y-2">
-                  <Label className="!text-success">Optimized · double-click a paragraph to hear it</Label>
-                  <SpeakableMarkdown>{sec.optimized}</SpeakableMarkdown>
-                </div>
+                <SectionRefine
+                  presentationId={id}
+                  sectionIndex={sec.index}
+                  optimized={sec.optimized}
+                />
 
                 <details className="group">
                   <summary className="label cursor-pointer hover:text-primary list-none flex items-center gap-1.5">

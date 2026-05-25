@@ -20,6 +20,12 @@ export const memoryStore: Store = {
     const r = db.get(id);
     if (r && r.userId === userId) r.practice = practice;
   },
+  async updateOptimized(id, userId, sectionIndex, optimized) {
+    const r = db.get(id);
+    if (r && r.userId === userId && r.plan.sections[sectionIndex]) {
+      r.plan.sections[sectionIndex].optimized = optimized;
+    }
+  },
   async rename(id, userId, title) {
     const r = db.get(id);
     if (r && r.userId === userId) r.title = title;
