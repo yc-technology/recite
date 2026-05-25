@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 const AcceptBody = z.object({
   presentationId: z.string().min(1),
   sectionIndex: z.number().int().nonnegative(),
-  optimized: z.string().min(1),
+  optimized: z.string().min(1).max(10000),
 });
 
 // PUT = accept/persist the chosen candidate (no LLM call).
