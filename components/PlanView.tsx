@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Presentation } from "lucide-react";
 import type { PresentationRecord } from "@/lib/store/types";
 import { Button, Label } from "@/components/nothing";
 import { PresentationActions } from "@/components/PresentationActions";
@@ -48,12 +48,20 @@ export function PlanView({
             </span>
             <Label className="pb-3">/ {plan.sections.length} due now</Label>
           </div>
-          <Link href={`/practice/${record.id}`}>
-            <Button variant="primary" className="px-8 py-4 gap-2">
-              {dueCount > 0 ? "Enter focus" : "Practice anyway"}
-              <ArrowRight size={15} />
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href={`/present/${record.id}`}>
+              <Button variant="outline" className="px-6 py-4 gap-2">
+                <Presentation size={15} />
+                Present
+              </Button>
+            </Link>
+            <Link href={`/practice/${record.id}`}>
+              <Button variant="primary" className="px-8 py-4 gap-2">
+                {dueCount > 0 ? "Enter focus" : "Practice anyway"}
+                <ArrowRight size={15} />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
