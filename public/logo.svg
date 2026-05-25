@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Recite logo</title>
+  <style>
+    .ink { fill: #000000; }
+    .accent { fill: #d71921; }
+    @media (prefers-color-scheme: dark) {
+      .ink { fill: #ffffff; }
+      .accent { fill: #d71921; }
+    }
+  </style>
+  <g class="ink">
+    <circle cx="64" cy="48" r="8.5"/>
+    <circle cx="88" cy="48" r="8.5"/>
+    <circle cx="112" cy="48" r="8.5"/>
+    <circle cx="136" cy="48" r="8.5"/>
+    <circle cx="64" cy="72" r="8.5"/>
+    <circle cx="160" cy="72" r="8.5"/>
+    <circle cx="64" cy="96" r="8.5"/>
+    <circle cx="160" cy="96" r="8.5"/>
+    <circle cx="64" cy="120" r="8.5"/>
+    <circle cx="88" cy="120" r="8.5"/>
+    <circle cx="112" cy="120" r="8.5"/>
+    <circle cx="136" cy="120" r="8.5"/>
+    <circle cx="64" cy="144" r="8.5"/>
+    <circle cx="112" cy="144" r="8.5"/>
+    <circle cx="64" cy="168" r="8.5"/>
+    <circle cx="136" cy="168" r="8.5"/>
+    <circle cx="64" cy="192" r="8.5"/>
+  </g>
+  <circle class="accent" cx="160" cy="192" r="8.5"/>
+</svg>
