@@ -39,6 +39,7 @@ export function SectionRefine({
       });
       if (!res.ok) throw new Error(`refine failed (${res.status})`);
       const { optimized: draft } = await res.json();
+      if (!draft) throw new Error("empty draft");
       setCandidate(draft);
     } catch (e) {
       notify(`[ERROR: ${e instanceof Error ? e.message : "refine failed"}]`);
@@ -96,11 +97,11 @@ export function SectionRefine({
                     <Check size={13} />
                     {accepting ? "SAVING…" : "ACCEPT"}
                   </Button>
-                  <Button variant="ghost" onClick={() => generate(lastInstruction)} className="!px-4 !py-2 gap-1.5">
+                  <Button variant="ghost" onClick={() => generate(lastInstruction)} disabled={accepting} className="!px-4 !py-2 gap-1.5">
                     <RotateCcw size={13} />
                     REGENERATE
                   </Button>
-                  <Button variant="ghost" onClick={() => setCandidate(null)} className="!px-4 !py-2 gap-1.5">
+                  <Button variant="ghost" onClick={() => setCandidate(null)} disabled={accepting} className="!px-4 !py-2 gap-1.5">
                     <X size={13} />
                     DISCARD
                   </Button>
