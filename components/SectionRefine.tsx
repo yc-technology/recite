@@ -11,12 +11,10 @@ import { useNotify } from "@/components/Notify";
 export function SectionRefine({
   presentationId,
   sectionIndex,
-  title,
   optimized: initialOptimized,
 }: {
   presentationId: string;
   sectionIndex: number;
-  title: string;
   optimized: string;
 }) {
   const notify = useNotify();
