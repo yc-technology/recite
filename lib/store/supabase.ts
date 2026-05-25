@@ -135,6 +135,17 @@ export const supabaseStore: Store = {
     }
   },
 
+  async updateOptimized(id, userId, sectionIndex, optimized) {
+    const supabase = await createClient();
+    void userId; // RLS scopes the update to the owner
+    const { error } = await supabase
+      .from("segments")
+      .update({ optimized })
+      .eq("presentation_id", id)
+      .eq("order_index", sectionIndex);
+    if (error) throw error;
+  },
+
   async rename(id, userId, title) {
     const supabase = await createClient();
     void userId; // RLS scopes the update to the owner

@@ -21,6 +21,7 @@ export interface Store {
   get(id: string, userId: string): Promise<PresentationRecord | null>;
   listByUser(userId: string): Promise<PresentationRecord[]>;
   updatePractice(id: string, userId: string, practice: PracticeState[]): Promise<void>;
+  updateOptimized(id: string, userId: string, sectionIndex: number, optimized: string): Promise<void>;
   rename(id: string, userId: string, title: string): Promise<void>;
   remove(id: string, userId: string): Promise<void>;
 }
