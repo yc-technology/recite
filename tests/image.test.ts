@@ -15,9 +15,10 @@ describe("isImageDataUrl", () => {
     expect(isImageDataUrl("data:image/gif;base64,R0lGOD")).toBe(false);
     expect(isImageDataUrl("data:image/png;base64,")).toBe(false);
     expect(isImageDataUrl("")).toBe(false);
+    expect(isImageDataUrl("data:image/png;base64,abc===")).toBe(false);
   });
 
-  it("exposes a positive char cap", () => {
-    expect(MAX_IMAGE_DATA_URL_CHARS).toBeGreaterThan(0);
+  it("exposes the expected char cap", () => {
+    expect(MAX_IMAGE_DATA_URL_CHARS).toBe(10_000_000);
   });
 });

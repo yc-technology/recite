@@ -39,7 +39,7 @@ export function NotifyProvider({ children }: { children: ReactNode }) {
           <button
             key={n.id}
             onClick={() => setNotes((x) => x.filter((y) => y.id !== n.id))}
-            className={`pointer-events-auto w-full text-left bg-surface border rounded-[4px] px-4 py-3 font-mono text-caption ${
+            className={`pointer-events-auto w-full text-left bg-surface border rounded-[4px] px-4 py-3 font-mono text-caption hover:opacity-80 ${
               n.kind === "error"
                 ? "border-accent text-accent"
                 : "border-border-strong text-primary"
