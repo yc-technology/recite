@@ -39,9 +39,9 @@ export function DeckCard({
     <Card className="flex items-center justify-between gap-4 hover:border-border-strong">
       <button
         onClick={() => router.push(`/presentation/${id}`)}
-        className="text-left min-w-0 flex-1"
+        className="group text-left min-w-0 flex-1"
       >
-        <h3 className="font-grotesk font-medium text-primary text-subtitle truncate">
+        <h3 className="font-grotesk font-medium text-primary group-hover:text-accent transition-colors text-subtitle truncate">
           {title}
         </h3>
         <Label>{total} sections</Label>

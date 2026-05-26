@@ -17,7 +17,7 @@ const components: Components = {
   ),
   strong: (props) => <strong className="font-medium text-display" {...props} />,
   em: (props) => <em className="italic" {...props} />,
-  a: (props) => <a className="text-interactive underline" {...props} />,
+  a: (props) => <a className="text-interactive underline hover:opacity-80" {...props} />,
   code: (props) => (
     <code className="font-mono text-label text-secondary" {...props} />
   ),
