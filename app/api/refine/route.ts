@@ -5,6 +5,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { isLlmAllowed } from "@/lib/allowlist";
 import { supabaseStore } from "@/lib/store/supabase";
 import { createClient } from "@/lib/supabase/server";
+import { isImageDataUrl, MAX_IMAGE_DATA_URL_CHARS } from "@/lib/image";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -17,11 +18,16 @@ async function authed() {
   return user;
 }
 
-const GenBody = z.object({
-  presentationId: z.string().min(1),
-  sectionIndex: z.number().int().nonnegative(),
-  instruction: z.string().min(1).max(500),
-});
+const GenBody = z
+  .object({
+    presentationId: z.string().min(1),
+    sectionIndex: z.number().int().nonnegative(),
+    instruction: z.string().max(500).optional(),
+    image: z.string().optional(),
+  })
+  .refine((d) => Boolean(d.instruction?.trim()) || Boolean(d.image), {
+    message: "instruction or image required",
+  });
 
 // POST = generate a candidate (no DB write).
 export async function POST(req: NextRequest) {
@@ -38,7 +44,10 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid input" }, { status: 400 });
   }
-  const { presentationId, sectionIndex, instruction } = parsed.data;
+  const { presentationId, sectionIndex, instruction, image } = parsed.data;
+  if (image && (!isImageDataUrl(image) || image.length > MAX_IMAGE_DATA_URL_CHARS)) {
+    return NextResponse.json({ error: "invalid image" }, { status: 400 });
+  }
 
   const rec = await supabaseStore.get(presentationId, user.id);
   const section = rec?.plan.sections[sectionIndex];
@@ -47,7 +56,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const optimized = await refineOptimized(section.title, section.optimized, instruction);
+    const optimized = await refineOptimized(section.title, section.optimized, instruction ?? "", image);
     if (!optimized) throw new Error("empty result");
     return NextResponse.json({ optimized });
   } catch (e) {
