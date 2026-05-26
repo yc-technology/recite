@@ -51,6 +51,7 @@ export function SectionRefine({
   const [open, setOpen] = useState(false);
   const [instruction, setInstruction] = useState("");
   const [lastInstruction, setLastInstruction] = useState("");
+  const [lastImage, setLastImage] = useState<string | null>(null);
   const [image, setImage] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [candidate, setCandidate] = useState<string | null>(null);
@@ -59,11 +60,12 @@ export function SectionRefine({
 
   const canSubmit = Boolean(instruction.trim()) || Boolean(image);
 
-  async function generate(text: string) {
+  async function generate(text: string, img: string | null) {
     const q = text.trim();
-    if ((!q && !image) || generating) return;
+    if ((!q && !img) || generating) return;
     setGenerating(true);
     setLastInstruction(q);
+    setLastImage(img);
     try {
       const res = await fetch("/api/refine", {
         method: "POST",
@@ -72,7 +74,7 @@ export function SectionRefine({
           presentationId,
           sectionIndex,
           instruction: q,
-          image: image ?? undefined,
+          image: img ?? undefined,
         }),
       });
       if (!res.ok) throw new Error(`refine failed (${res.status})`);
@@ -153,7 +155,7 @@ export function SectionRefine({
                     <Check size={13} />
                     {accepting ? "SAVING…" : "ACCEPT"}
                   </Button>
-                  <Button variant="ghost" onClick={() => generate(lastInstruction)} disabled={accepting} className="!px-4 !py-2 gap-1.5">
+                  <Button variant="ghost" onClick={() => generate(lastInstruction, lastImage)} disabled={accepting} className="!px-4 !py-2 gap-1.5">
                     <RotateCcw size={13} />
                     REGENERATE
                   </Button>
@@ -183,15 +185,16 @@ export function SectionRefine({
               autoFocus
               value={instruction}
               onChange={(e) => setInstruction(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && canSubmit && generate(instruction)}
+              onKeyDown={(e) => e.key === "Enter" && canSubmit && generate(instruction, image)}
               placeholder="how should I improve this? e.g. make it more conversational"
               className="flex-1 bg-surface border border-border rounded-[4px] px-3 py-2 text-primary text-body focus:border-primary outline-none"
             />
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
+              disabled={generating || accepting}
               aria-label="Attach reference image"
-              className="label hover:text-primary border border-border-strong rounded-[4px] px-3 flex items-center"
+              className={`border border-border-strong rounded-[4px] px-3 flex items-center disabled:opacity-40 disabled:cursor-not-allowed ${image ? "text-accent" : "label hover:text-primary"}`}
             >
               <ImagePlus size={16} />
             </button>
@@ -204,7 +207,7 @@ export function SectionRefine({
             />
             <Button
               variant="primary"
-              onClick={() => generate(instruction)}
+              onClick={() => generate(instruction, image)}
               disabled={generating || !canSubmit}
               className="gap-1.5"
             >
