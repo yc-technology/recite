@@ -19,6 +19,6 @@ describe("isImageDataUrl", () => {
   });
 
   it("exposes the expected char cap", () => {
-    expect(MAX_IMAGE_DATA_URL_CHARS).toBe(10_000_000);
+    expect(MAX_IMAGE_DATA_URL_CHARS).toBe(4_000_000);
   });
 });

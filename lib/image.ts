@@ -7,5 +7,7 @@ export function isImageDataUrl(s: string): boolean {
   return IMAGE_DATA_URL.test(s);
 }
 
-// ~7.5 MB decoded — a backstop on the inline image payload sent to the model.
-export const MAX_IMAGE_DATA_URL_CHARS = 10_000_000;
+// ~3 MB of base64 — kept under Vercel's ~4.5 MB function body limit so an oversized
+// image yields a clean 400 from us rather than an opaque platform 413. The client
+// downscales images well below this before upload.
+export const MAX_IMAGE_DATA_URL_CHARS = 4_000_000;
