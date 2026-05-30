@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronRight, List, Play, X } from "lucide-react";
 import { Card, Label } from "@/components/nothing";
 import { SectionRefine } from "@/components/SectionRefine";
+import { SectionAdd } from "@/components/SectionAdd";
 
 export type SectionView = {
   index: number;
@@ -81,7 +82,10 @@ export function SectionBoard({
       </div>
 
       <section className="space-y-5">
-        <Label>Sections — {sections.length}</Label>
+        <div className="flex items-center justify-between gap-3">
+          <Label>Sections — {sections.length}</Label>
+          <SectionAdd id={id} sectionTitles={sections.map((s) => s.title)} />
+        </div>
 
         <ol className="space-y-3">
           {sections.map((sec) => {
