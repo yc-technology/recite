@@ -50,16 +50,20 @@ Configured via env: `OPENAI_BASE_URL=https://coding.dashscope.aliyuncs.com/v1`,
 - `lib/agent/` — `runtime.ts` (SDK config), `normalize.ts` (messy text → sectioned JSON),
   `analyze.ts` (per-section summary/keyPoints/difficulty/**optimized** rewrite, with a
   selectable style; `mergeEnrichments` is pure + tested), `write.ts` (writing review),
-  `chat.ts` (section coach), `schema.ts` (all zod schemas).
+  `chat.ts` (section coach), `schema.ts` (all zod schemas),
+  `addSection.ts` (produces one enriched section from raw text via normalize+analyze;
+  `generateSection`; `collapseToOneSection` is pure + tested).
 - `lib/store/` — `types.ts` (`Store` interface), `supabase.ts` (live impl, snake↔camel
   mapping boundary), `memory.ts` (retained for reference), `chat.ts` (chat persistence).
+- `lib/sections.ts` — `insertSectionIntoPlan` (atomic insert + reindex helper). Pure, tested.
 - `lib/ratelimit.ts` (per-user, api_usage table) · `lib/allowlist.ts` (LLM email gate)
   · `lib/tts.ts` (browser TTS helpers) · `lib/supabase/` (browser/server/proxy clients).
 - `app/api/*` — Node-runtime route handlers. `proxy.ts` (root) gates unauthenticated
   users to `/login` and refreshes the Supabase session.
 - `components/` — `SectionBoard` (sections + sticky progress + floating nav),
   `PracticeSession`, `SpeakableMarkdown` + `TtsProvider` (double-click a paragraph to
-  hear it; controls in an animated floating panel), `SectionChat`, `Notify` (global
+  hear it; controls in an animated floating panel), `SectionChat`, `SectionAdd` (paste
+  raw text → preview → insert new section at a chosen position), `Notify` (global
   inline error toasts), `nothing/` primitives.
 
 ## Critical gotchas (learned the hard way)
@@ -131,7 +135,8 @@ client-prerendered page, `/login`, creates the Supabase client lazily in handler
 ## DB migrations (`supabase/migrations/`, apply in order)
 
 `0001_init` (tables + RLS) · `0002_v2_sections` (summary/key_points/mastery_level) ·
-`0003_optimized` · `0004_chat` (chat_messages) · `0005_rate_limit` (api_usage).
+`0003_optimized` · `0004_chat` (chat_messages) · `0005_rate_limit` (api_usage) ·
+`0006_add_section` (insert_section_at function: atomic insert + reindex).
 New `create policy` statements need `drop policy if exists` first (idempotency).
 
 ## Testing
