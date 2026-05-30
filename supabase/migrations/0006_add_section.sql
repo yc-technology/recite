@@ -1,5 +1,5 @@
 -- 0006_add_section: atomically insert a section at a position, shifting the
--- trailing segments + practice cards. SECURITY INVOKER (default) → RLS applies.
+-- trailing segments + practice cards + chat messages. SECURITY INVOKER (default) → RLS applies.
 create or replace function insert_section_at(
   p_presentation_id uuid,
   p_position int,
@@ -17,6 +17,8 @@ begin
   update segments set order_index = order_index + 1
     where presentation_id = p_presentation_id and order_index >= p_position;
   update practice_records set segment_index = segment_index + 1
+    where presentation_id = p_presentation_id and segment_index >= p_position;
+  update chat_messages set segment_index = segment_index + 1
     where presentation_id = p_presentation_id and segment_index >= p_position;
   insert into segments(presentation_id, order_index, title, content, optimized,
                        summary, key_points, difficulty)
