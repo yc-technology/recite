@@ -1,4 +1,5 @@
 import type { Store, PresentationRecord, PracticeState } from "./types";
+import type { Section } from "@/lib/agent/schema";
 import { createClient } from "@/lib/supabase/server";
 
 export const supabaseStore: Store = {
@@ -145,6 +146,22 @@ export const supabaseStore: Store = {
       .eq("order_index", sectionIndex);
     if (error) throw error;
     if (count === 0) throw new Error(`segment ${sectionIndex} not found`);
+  },
+
+  async addSection(id, userId, position, section: Section) {
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("insert_section_at", {
+      p_presentation_id: id,
+      p_position: position,
+      p_title: section.title,
+      p_content: section.text,
+      p_optimized: section.optimized,
+      p_summary: section.summary,
+      p_key_points: section.keyPoints,
+      p_difficulty: section.difficulty,
+      p_user_id: userId,
+    });
+    if (error) throw error;
   },
 
   async rename(id, userId, title) {
