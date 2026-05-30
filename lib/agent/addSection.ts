@@ -1,6 +1,4 @@
-import { Agent, run } from "@openai/agents";
 import {
-  EnrichmentsSchema,
   type Normalized,
   type NormalizedSection,
   type Section,
@@ -19,4 +17,18 @@ export function collapseToOneSection(normalized: Normalized): NormalizedSection 
     .filter((t) => t.length > 0)
     .join("\n\n");
   return { title, text };
+}
+
+// Raw pasted text → one fully-enriched Section, via the existing pipeline:
+// normalize (clean + title) → collapse to one → analyze (summary/keyPoints/
+// difficulty/optimized). No prompt changes; the model never invents the text.
+export async function generateSection(
+  rawText: string,
+  style: OptimizeStyle = "simple",
+): Promise<Section> {
+  const normalized = await normalizePresentation(rawText);
+  const one = collapseToOneSection(normalized);
+  const plan = await analyzeSections([one], style);
+  // analyzeSections returns a StudyPlan with exactly one merged section.
+  return plan.sections[0];
 }
